@@ -20,7 +20,7 @@
                         y="-17"
                         ng-attr-width="{{100 + 4}}"
                         ng-attr-height="{{30 + 4}}"
-                        ng-attr-class="{{device.selected || device.remote_selected ? device.selected && device.remote_selected ? 'selected-conflict' : device.selected ? 'selected' : 'remote-selected' : 'hidden'}}"
+                        ng-attr-class="{{table.selected || table.remote_selected ? table.selected && table.remote_selected ? 'selected-conflict' : table.selected ? 'selected' : 'remote-selected' : 'hidden'}}"
                         rx=10>
                     </rect>
                     <rect
@@ -33,10 +33,10 @@
                     <circle cx="30" cy="0" r=7 />
                     </circle>
                     <g ng-show="current_scale > 0.5">
-                    <text ng-attr-class="{{device.selected && ! device.edit_label ? 'selected' : 'hidden'}}"
+                    <text ng-attr-class="{{table.selected && ! table.edit_label ? 'selected' : 'hidden'}}"
 						  filter="url(#selected)"
                           text-anchor="middle"
 						  x="0"
-						  y="5"> {{device.name}} </text>
-                    <text text-anchor="middle" x="0" y="5">{{device.name}}{{device.edit_label?'_':''}}</text>
+						  y="5"> {{table.name}} </text>
+                    <text text-anchor="middle" x="0" y="5">{{table.name}}{{table.edit_label?'_':''}}</text>
                     </g>

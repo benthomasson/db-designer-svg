@@ -5,7 +5,7 @@ function serialize(message) {
 }
 exports.serialize = serialize;
 
-function DeviceMove(sender, id, x, y, previous_x, previous_y) {
+function TableMove(sender, id, x, y, previous_x, previous_y) {
     this.sender = sender;
     this.id = id;
     this.x = x;
@@ -13,9 +13,9 @@ function DeviceMove(sender, id, x, y, previous_x, previous_y) {
     this.previous_x = previous_x;
     this.previous_y = previous_y;
 }
-exports.DeviceMove = DeviceMove;
+exports.TableMove = TableMove;
 
-function DeviceCreate(sender, id, x, y, name, type) {
+function TableCreate(sender, id, x, y, name, type) {
     this.sender = sender;
     this.id = id;
     this.x = x;
@@ -23,9 +23,9 @@ function DeviceCreate(sender, id, x, y, name, type) {
     this.name = name;
     this.type = type;
 }
-exports.DeviceCreate = DeviceCreate;
+exports.TableCreate = TableCreate;
 
-function DeviceDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
+function TableDestroy(sender, id, previous_x, previous_y, previous_name, previous_type) {
     this.sender = sender;
     this.id = id;
     this.previous_x = previous_x;
@@ -33,41 +33,41 @@ function DeviceDestroy(sender, id, previous_x, previous_y, previous_name, previo
     this.previous_name = previous_name;
     this.previous_type = previous_type;
 }
-exports.DeviceDestroy = DeviceDestroy;
+exports.TableDestroy = TableDestroy;
 
-function DeviceLabelEdit(sender, id, name, previous_name) {
+function TableLabelEdit(sender, id, name, previous_name) {
     this.sender = sender;
     this.id = id;
     this.name = name;
     this.previous_name = previous_name;
 }
-exports.DeviceLabelEdit = DeviceLabelEdit;
+exports.TableLabelEdit = TableLabelEdit;
 
-function DeviceSelected(sender, id) {
+function TableSelected(sender, id) {
     this.sender = sender;
     this.id = id;
 }
-exports.DeviceSelected = DeviceSelected;
+exports.TableSelected = TableSelected;
 
-function DeviceUnSelected(sender, id) {
+function TableUnSelected(sender, id) {
     this.sender = sender;
     this.id = id;
 }
-exports.DeviceUnSelected = DeviceUnSelected;
+exports.TableUnSelected = TableUnSelected;
 
-function LinkCreate(sender, from_id, to_id) {
+function RelationCreate(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;
     this.to_id = to_id;
 }
-exports.LinkCreate = LinkCreate;
+exports.RelationCreate = RelationCreate;
 
-function LinkDestroy(sender, from_id, to_id) {
+function RelationDestroy(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;
     this.to_id = to_id;
 }
-exports.LinkDestroy = LinkDestroy;
+exports.RelationDestroy = RelationDestroy;
 
 function Undo(sender, original_message) {
     this.sender = sender;

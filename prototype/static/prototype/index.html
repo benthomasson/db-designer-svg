@@ -26,13 +26,13 @@
 		</filter>
 		</defs>
          <g transform="scale(1.0)" id="frame_g">
-            <g ng-repeat="link in links">
-            <g link></g>
+            <g ng-repeat="relation in relations">
+            <g relation></g>
             </g>
-            <g ng-repeat="device in devices"
-               ng-attr-transform="translate({{device.x}},{{device.y}})"
-               ng-attr-class="{{device.type}}"
-               ng-switch on="device.type">
+            <g ng-repeat="table in tables"
+               ng-attr-transform="translate({{table.x}},{{table.y}})"
+               ng-attr-class="{{table.type}}"
+               ng-switch on="table.type">
                <g ng-switch-when="router"><!-- begin router -->
                    <g router></g>
                </g> <!-- end router -->

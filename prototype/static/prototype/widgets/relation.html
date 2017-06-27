@@ -1,0 +1,10 @@
+                <line ng-attr-x1="{{relation.from_table.x}}"
+                      ng-attr-y1="{{relation.from_table.y}}"
+                      ng-attr-x2="{{relation.to_table !== null ? relation.to_table.x : scaledX}}"
+                      ng-attr-y2="{{relation.to_table !== null ? relation.to_table.y : scaledY}}"
+                      ng-attr-class="{{relation.selected && 'selected' || 'hidden'}}"/>
+                <line ng-attr-x1="{{relation.from_table.x}}"
+                      ng-attr-y1="{{relation.from_table.y}}"
+                      ng-attr-x2="{{relation.to_table !== null ? relation.to_table.x : scaledX}}"
+                      ng-attr-y2="{{relation.to_table !== null ? relation.to_table.y : scaledY}}"
+                      class="relation {{relation.status === null ? 'unknown' : relation.status ? 'pass' : 'fail'}}"/>

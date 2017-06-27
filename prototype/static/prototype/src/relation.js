@@ -66,13 +66,13 @@ exports.Selecting = Selecting;
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
     if ($event.key === 'l') {
-        controller.state.onNewLink(controller, $event);
+        controller.state.onNewRelation(controller, $event);
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
 };
 
-_Ready.prototype.onNewLink = function (controller) {
+_Ready.prototype.onNewRelation = function (controller) {
 
     controller.scope.clear_selections();
     controller.changeState(Selecting);
@@ -100,20 +100,20 @@ _Connecting.prototype.onMouseDown = function () {
 
 _Connecting.prototype.onMouseUp = function (controller) {
 
-    var selected_device = controller.scope.select_devices(false);
-    if (selected_device !== null) {
-        controller.scope.new_link.to_device = selected_device;
-        controller.scope.send_control_message(new messages.LinkCreate(controller.scope.client_id,
-                                                                      controller.scope.new_link.from_device.id,
-                                                                      controller.scope.new_link.to_device.id));
-        controller.scope.new_link = null;
+    var selected_table = controller.scope.select_tables(false);
+    if (selected_table !== null) {
+        controller.scope.new_relation.to_table = selected_table;
+        controller.scope.send_control_message(new messages.RelationCreate(controller.scope.client_id,
+                                                                      controller.scope.new_relation.from_table.id,
+                                                                      controller.scope.new_relation.to_table.id));
+        controller.scope.new_relation = null;
         controller.changeState(Connected);
     } else {
-        var index = controller.scope.links.indexOf(controller.scope.new_link);
+        var index = controller.scope.relations.indexOf(controller.scope.new_relation);
         if (index !== -1) {
-            controller.scope.links.splice(index, 1);
+            controller.scope.relations.splice(index, 1);
         }
-        controller.scope.new_link = null;
+        controller.scope.new_relation = null;
         controller.changeState(Ready);
     }
 };
@@ -124,10 +124,10 @@ _Selecting.prototype.onMouseDown = function () {
 
 _Selecting.prototype.onMouseUp = function (controller) {
 
-    var selected_device = controller.scope.select_devices(false);
-    if (selected_device !== null) {
-        controller.scope.new_link = new models.Link(selected_device, null, true);
-        controller.scope.links.push(controller.scope.new_link);
+    var selected_table = controller.scope.select_tables(false);
+    if (selected_table !== null) {
+        controller.scope.new_relation = new models.Relation(selected_table, null, true);
+        controller.scope.relations.push(controller.scope.new_relation);
         controller.changeState(Connecting);
     }
 };

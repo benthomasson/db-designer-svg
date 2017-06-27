@@ -4,7 +4,7 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
-var link = require('./link.js');
+var relation = require('./relation.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
 var util = require('./util.js');
@@ -39,13 +39,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.pressedScaledY = 0;
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
-  $scope.selected_devices = [];
-  $scope.selected_links = [];
-  $scope.new_link = null;
+  $scope.selected_tables = [];
+  $scope.selected_relations = [];
+  $scope.new_relation = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
-  $scope.link_controller = new fsm.FSMController($scope, link.Start, $scope.move_controller);
-  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.link_controller);
+  $scope.relation_controller = new fsm.FSMController($scope, relation.Start, $scope.move_controller);
+  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.relation_controller);
   $scope.time_controller = new fsm.FSMController($scope, time.Start, $scope.buttons_controller);
   $scope.first_controller = $scope.time_controller;
   $scope.last_key = "";
@@ -58,13 +58,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.graph = {'width': window.innerWidth,
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
-  $scope.device_id_seq = util.natural_numbers(0);
+  $scope.table_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
 
 
-  $scope.devices = [
+  $scope.tables = [
   ];
 
   $scope.stencils = [
@@ -79,7 +79,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
   ];
 
-  $scope.links = [
+  $scope.relations = [
   ];
 
 
@@ -134,26 +134,26 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.clear_selections = function () {
 
         var i = 0;
-        var devices = $scope.devices;
-        var links = $scope.links;
-        $scope.selected_devices = [];
-        $scope.selected_links = [];
-        for (i = 0; i < devices.length; i++) {
-            if (devices[i].selected) {
-                $scope.send_control_message(new messages.DeviceUnSelected($scope.client_id, devices[i].id));
+        var tables = $scope.tables;
+        var relations = $scope.relations;
+        $scope.selected_tables = [];
+        $scope.selected_relations = [];
+        for (i = 0; i < tables.length; i++) {
+            if (tables[i].selected) {
+                $scope.send_control_message(new messages.TableUnSelected($scope.client_id, tables[i].id));
             }
-            devices[i].selected = false;
+            tables[i].selected = false;
         }
-        for (i = 0; i < links.length; i++) {
-            links[i].selected = false;
+        for (i = 0; i < relations.length; i++) {
+            relations[i].selected = false;
         }
     };
 
-    $scope.select_devices = function (multiple_selection) {
+    $scope.select_tables = function (multiple_selection) {
 
         var i = 0;
-        var devices = $scope.devices;
-        var last_selected_device = null;
+        var tables = $scope.tables;
+        var last_selected_table = null;
 
         $scope.pressedX = $scope.mouseX;
         $scope.pressedY = $scope.mouseY;
@@ -164,20 +164,20 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.clear_selections();
         }
 
-        for (i = devices.length - 1; i >= 0; i--) {
-            if (devices[i].is_selected($scope.scaledX, $scope.scaledY)) {
-                devices[i].selected = true;
-                $scope.send_control_message(new messages.DeviceSelected($scope.client_id, devices[i].id));
-                last_selected_device = devices[i];
-                if ($scope.selected_devices.indexOf(devices[i]) === -1) {
-                    $scope.selected_devices.push(devices[i]);
+        for (i = tables.length - 1; i >= 0; i--) {
+            if (tables[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                tables[i].selected = true;
+                $scope.send_control_message(new messages.TableSelected($scope.client_id, tables[i].id));
+                last_selected_table = tables[i];
+                if ($scope.selected_tables.indexOf(tables[i]) === -1) {
+                    $scope.selected_tables.push(tables[i]);
                 }
                 if (!multiple_selection) {
                     break;
                 }
             }
         }
-        return last_selected_device;
+        return last_selected_table;
     };
 
     $scope.forget_time = function () {
@@ -253,8 +253,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.send_snapshot = function () {
         var data = JSON.stringify(['Snapshot', {"sender": $scope.client_id,
-                                                "devices": $scope.devices,
-                                                "links": $scope.links,
+                                                "tables": $scope.tables,
+                                                "relations": $scope.relations,
                                                 "scale": $scope.scale,
                                                 "panX": $scope.panX,
                                                 "panY": $scope.panY,
@@ -274,114 +274,114 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
 
-    $scope.onDeviceCreate = function(data) {
-        $scope.create_device(data);
+    $scope.onTableCreate = function(data) {
+        $scope.create_table(data);
     };
 
-    $scope.create_device = function(data) {
-        var device = new models.Device(data.id,
+    $scope.create_table = function(data) {
+        var table = new models.Table(data.id,
                                        data.name,
                                        data.x,
                                        data.y,
                                        data.type);
-        $scope.device_id_seq = util.natural_numbers(data.id);
-        $scope.devices.push(device);
+        $scope.table_id_seq = util.natural_numbers(data.id);
+        $scope.tables.push(table);
     };
 
-    $scope.onDeviceLabelEdit = function(data) {
-        $scope.edit_device_label(data);
+    $scope.onTableLabelEdit = function(data) {
+        $scope.edit_table_label(data);
     };
 
-    $scope.edit_device_label = function(data) {
+    $scope.edit_table_label = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].name = data.name;
+        for (i = 0; i < $scope.tables.length; i++) {
+            if ($scope.tables[i].id === data.id) {
+                $scope.tables[i].name = data.name;
                 break;
             }
         }
     };
 
-    $scope.onLinkCreate = function(data) {
-        $scope.create_link(data);
+    $scope.onRelationCreate = function(data) {
+        $scope.create_relation(data);
     };
 
-    $scope.create_link = function(data) {
+    $scope.create_relation = function(data) {
         var i = 0;
-        var new_link = new models.Link(null, null);
-        for (i = 0; i < $scope.devices.length; i++){
-            if ($scope.devices[i].id === data.from_id) {
-                new_link.from_device = $scope.devices[i];
+        var new_relation = new models.Relation(null, null);
+        for (i = 0; i < $scope.tables.length; i++){
+            if ($scope.tables[i].id === data.from_id) {
+                new_relation.from_table = $scope.tables[i];
             }
         }
-        for (i = 0; i < $scope.devices.length; i++){
-            if ($scope.devices[i].id === data.to_id) {
-                new_link.to_device = $scope.devices[i];
+        for (i = 0; i < $scope.tables.length; i++){
+            if ($scope.tables[i].id === data.to_id) {
+                new_relation.to_table = $scope.tables[i];
             }
         }
-        if (new_link.from_device !== null && new_link.to_device !== null) {
-            $scope.links.push(new_link);
+        if (new_relation.from_table !== null && new_relation.to_table !== null) {
+            $scope.relations.push(new_relation);
         }
     };
 
-    $scope.onLinkDestroy = function(data) {
-        $scope.destroy_link(data);
+    $scope.onRelationDestroy = function(data) {
+        $scope.destroy_relation(data);
     };
 
-    $scope.destroy_link = function(data) {
+    $scope.destroy_relation = function(data) {
         var i = 0;
-        var link = null;
+        var relation = null;
         var index = -1;
-        for (i = 0; i < $scope.links.length; i++) {
-            link = $scope.links[i];
-            if (link.from_device.id === data.from_id && link.to_device.id === data.to_id) {
-                index = $scope.links.indexOf(link);
-                $scope.links.splice(index, 1);
+        for (i = 0; i < $scope.relations.length; i++) {
+            relation = $scope.relations[i];
+            if (relation.from_table.id === data.from_id && relation.to_table.id === data.to_id) {
+                index = $scope.relations.indexOf(relation);
+                $scope.relations.splice(index, 1);
             }
         }
     };
 
-    $scope.onDeviceMove = function(data) {
-        $scope.move_devices(data);
+    $scope.onTableMove = function(data) {
+        $scope.move_tables(data);
     };
 
-    $scope.move_devices = function(data) {
+    $scope.move_tables = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].x = data.x;
-                $scope.devices[i].y = data.y;
+        for (i = 0; i < $scope.tables.length; i++) {
+            if ($scope.tables[i].id === data.id) {
+                $scope.tables[i].x = data.x;
+                $scope.tables[i].y = data.y;
                 break;
             }
         }
     };
 
-    $scope.onDeviceDestroy = function(data) {
-        $scope.destroy_device(data);
+    $scope.onTableDestroy = function(data) {
+        $scope.destroy_table(data);
     };
 
-    $scope.destroy_device = function(data) {
+    $scope.destroy_table = function(data) {
 
-        // Delete the device and any links connecting to the device.
+        // Delete the table and any relations connecting to the table.
         var i = 0;
         var j = 0;
         var dindex = -1;
         var lindex = -1;
-        var devices = $scope.devices.slice();
-        var all_links = $scope.links.slice();
-        for (i = 0; i < devices.length; i++) {
-            if (devices[i].id === data.id) {
-                dindex = $scope.devices.indexOf(devices[i]);
+        var tables = $scope.tables.slice();
+        var all_relations = $scope.relations.slice();
+        for (i = 0; i < tables.length; i++) {
+            if (tables[i].id === data.id) {
+                dindex = $scope.tables.indexOf(tables[i]);
                 if (dindex !== -1) {
-                    $scope.devices.splice(dindex, 1);
+                    $scope.tables.splice(dindex, 1);
                 }
                 lindex = -1;
-                for (j = 0; j < all_links.length; j++) {
-                    if (all_links[j].to_device === devices[i] ||
-                        all_links[j].from_device === devices[i]) {
-                        lindex = $scope.links.indexOf(all_links[j]);
+                for (j = 0; j < all_relations.length; j++) {
+                    if (all_relations[j].to_table === tables[i] ||
+                        all_relations[j].from_table === tables[i]) {
+                        lindex = $scope.relations.indexOf(all_relations[j]);
                         if (lindex !== -1) {
-                            $scope.links.splice(lindex, 1);
+                            $scope.relations.splice(lindex, 1);
                         }
                     }
                 }
@@ -393,28 +393,28 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var type = type_data[0];
         var data = type_data[1];
 
-        if (type === "DeviceMove") {
-            $scope.move_devices(data);
+        if (type === "TableMove") {
+            $scope.move_tables(data);
         }
 
-        if (type === "DeviceCreate") {
-            $scope.create_device(data);
+        if (type === "TableCreate") {
+            $scope.create_table(data);
         }
 
-        if (type === "DeviceDestroy") {
-            $scope.destroy_device(data);
+        if (type === "TableDestroy") {
+            $scope.destroy_table(data);
         }
 
-        if (type === "DeviceLabelEdit") {
-            $scope.edit_device_label(data);
+        if (type === "TableLabelEdit") {
+            $scope.edit_table_label(data);
         }
 
-        if (type === "LinkCreate") {
-            $scope.create_link(data);
+        if (type === "RelationCreate") {
+            $scope.create_relation(data);
         }
 
-        if (type === "LinkDestroy") {
-            $scope.destroy_link(data);
+        if (type === "RelationDestroy") {
+            $scope.destroy_relation(data);
         }
     };
 
@@ -424,39 +424,39 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var data = type_data[1];
         var inverted_data;
 
-        if (type === "DeviceMove") {
+        if (type === "TableMove") {
             inverted_data = angular.copy(data);
             inverted_data.x = data.previous_x;
             inverted_data.y = data.previous_y;
-            $scope.move_devices(inverted_data);
+            $scope.move_tables(inverted_data);
         }
 
-        if (type === "DeviceCreate") {
-            $scope.destroy_device(data);
+        if (type === "TableCreate") {
+            $scope.destroy_table(data);
         }
 
-        if (type === "DeviceDestroy") {
-            inverted_data = new messages.DeviceCreate(data.sender,
+        if (type === "TableDestroy") {
+            inverted_data = new messages.TableCreate(data.sender,
                                                       data.id,
                                                       data.previous_x,
                                                       data.previous_y,
                                                       data.previous_name,
                                                       data.previous_type);
-            $scope.create_device(inverted_data);
+            $scope.create_table(inverted_data);
         }
 
-        if (type === "DeviceLabelEdit") {
+        if (type === "TableLabelEdit") {
             inverted_data = angular.copy(data);
             inverted_data.name = data.previous_name;
-            $scope.edit_device_label(inverted_data);
+            $scope.edit_table_label(inverted_data);
         }
 
-        if (type === "LinkCreate") {
-            $scope.destroy_link(data);
+        if (type === "RelationCreate") {
+            $scope.destroy_relation(data);
         }
 
-        if (type === "LinkDestroy") {
-            $scope.create_link(data);
+        if (type === "RelationDestroy") {
+            $scope.create_relation(data);
         }
     };
 
@@ -472,22 +472,22 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $location.search({topology_id: data.topology_id});
     };
 
-    $scope.onDeviceSelected = function(data) {
+    $scope.onTableSelected = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].remote_selected = true;
-                console.log($scope.devices[i].remote_selected);
+        for (i = 0; i < $scope.tables.length; i++) {
+            if ($scope.tables[i].id === data.id) {
+                $scope.tables[i].remote_selected = true;
+                console.log($scope.tables[i].remote_selected);
             }
         }
     };
 
-    $scope.onDeviceUnSelected = function(data) {
+    $scope.onTableUnSelected = function(data) {
         var i = 0;
-        for (i = 0; i < $scope.devices.length; i++) {
-            if ($scope.devices[i].id === data.id) {
-                $scope.devices[i].remote_selected = false;
-                console.log($scope.devices[i].remote_selected);
+        for (i = 0; i < $scope.tables.length; i++) {
+            if ($scope.tables[i].id === data.id) {
+                $scope.tables[i].remote_selected = false;
+                console.log($scope.tables[i].remote_selected);
             }
         }
     };
@@ -505,52 +505,52 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     $scope.onSnapshot = function (data) {
 
         //Erase the existing state
-        $scope.devices = [];
-        $scope.links = [];
+        $scope.tables = [];
+        $scope.relations = [];
 
-        var device_map = {};
+        var table_map = {};
         var i = 0;
-        var device = null;
-        var new_device = null;
-        var max_device_id = null;
+        var table = null;
+        var new_table = null;
+        var max_table_id = null;
         var min_x = null;
         var min_y = null;
         var max_x = null;
         var max_y = null;
 
-        //Build the devices
-        for (i = 0; i < data.devices.length; i++) {
-            device = data.devices[i];
-            if (max_device_id === null || device.id > max_device_id) {
-                max_device_id = device.id;
+        //Build the tables
+        for (i = 0; i < data.tables.length; i++) {
+            table = data.tables[i];
+            if (max_table_id === null || table.id > max_table_id) {
+                max_table_id = table.id;
             }
-            if (min_x === null || device.x < min_x) {
-                min_x = device.x;
+            if (min_x === null || table.x < min_x) {
+                min_x = table.x;
             }
-            if (min_y === null || device.y < min_y) {
-                min_y = device.y;
+            if (min_y === null || table.y < min_y) {
+                min_y = table.y;
             }
-            if (max_x === null || device.x > max_x) {
-                max_x = device.x;
+            if (max_x === null || table.x > max_x) {
+                max_x = table.x;
             }
-            if (max_y === null || device.y > max_y) {
-                max_y = device.y;
+            if (max_y === null || table.y > max_y) {
+                max_y = table.y;
             }
-            new_device = new models.Device(device.id,
-                                           device.name,
-                                           device.x,
-                                           device.y,
-                                           device.type);
-            $scope.devices.push(new_device);
-            device_map[device.id] = new_device;
+            new_table = new models.Table(table.id,
+                                           table.name,
+                                           table.x,
+                                           table.y,
+                                           table.type);
+            $scope.tables.push(new_table);
+            table_map[table.id] = new_table;
         }
 
-        //Build the links
-        var link = null;
-        for (i = 0; i < data.links.length; i++) {
-            link = data.links[i];
-            $scope.links.push(new models.Link(device_map[link.from_device],
-                                              device_map[link.to_device]));
+        //Build the relations
+        var relation = null;
+        for (i = 0; i < data.relations.length; i++) {
+            relation = data.relations[i];
+            $scope.relations.push(new models.Relation(table_map[relation.from_table],
+                                              table_map[relation.to_table]));
         }
 
         var diff_x;
@@ -587,10 +587,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             $scope.updatePanAndScale();
         }
 
-        //Update the device_id_seq to be greater than all device ids to prevent duplicate ids.
-        if (max_device_id !== null) {
-            console.log(['max_device_id', max_device_id]);
-            $scope.device_id_seq = util.natural_numbers(max_device_id);
+        //Update the table_id_seq to be greater than all table ids to prevent duplicate ids.
+        if (max_table_id !== null) {
+            console.log(['max_table_id', max_table_id]);
+            $scope.table_id_seq = util.natural_numbers(max_table_id);
         }
     };
 
@@ -657,8 +657,8 @@ app.directive('host', function() {
   return { restrict: 'A', templateUrl: 'widgets/host.html' };
 });
 
-app.directive('link', function() {
-  return { restrict: 'A', templateUrl: 'widgets/link.html' };
+app.directive('relation', function() {
+  return { restrict: 'A', templateUrl: 'widgets/relation.html' };
 });
 
 app.directive('rack', function() {

@@ -65,12 +65,12 @@ _Past.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
-    if (['DeviceCreate',
-         'DeviceDestroy',
-         'DeviceMove',
-         'DeviceLabelEdit',
-         'LinkCreate',
-         'LinkDestroy'].indexOf(type) !== -1) {
+    if (['TableCreate',
+         'TableDestroy',
+         'TableMove',
+         'TableLabelEdit',
+         'RelationCreate',
+         'RelationDestroy'].indexOf(type) !== -1) {
         controller.changeState(Present);
         controller.scope.history.splice(controller.scope.time_pointer);
         if (data.sender !== controller.scope.client_id) {
@@ -80,14 +80,14 @@ _Past.prototype.onMessage = function(controller, message) {
         }
     }
 
-    if (type === 'DeviceSelected') {
+    if (type === 'TableSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceSelected(data);
+            controller.scope.onTableSelected(data);
         }
     }
-    if (type === 'DeviceUnSelected') {
+    if (type === 'TableUnSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceUnSelected(data);
+            controller.scope.onTableUnSelected(data);
         }
     }
 
@@ -193,10 +193,10 @@ _Present.prototype.onMessage = function(controller, message) {
     var type = type_data[0];
     var data = type_data[1];
 
-    if (type === 'DeviceCreate') {
+    if (type === 'TableCreate') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceCreate(data);
+            controller.scope.onTableCreate(data);
         }
     }
     if (type === 'LinkCreate') {
@@ -205,32 +205,32 @@ _Present.prototype.onMessage = function(controller, message) {
             controller.scope.onLinkCreate(data);
         }
     }
-    if (type === 'DeviceMove') {
+    if (type === 'TableMove') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceMove(data);
+            controller.scope.onTableMove(data);
         }
     }
-    if (type === 'DeviceDestroy') {
+    if (type === 'TableDestroy') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceDestroy(data);
+            controller.scope.onTableDestroy(data);
         }
     }
-    if (type === 'DeviceLabelEdit') {
+    if (type === 'TableLabelEdit') {
         controller.scope.history.push(message.data);
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceLabelEdit(data);
+            controller.scope.onTableLabelEdit(data);
         }
     }
-    if (type === 'DeviceSelected') {
+    if (type === 'TableSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceSelected(data);
+            controller.scope.onTableSelected(data);
         }
     }
-    if (type === 'DeviceUnSelected') {
+    if (type === 'TableUnSelected') {
         if (data.sender !== controller.scope.client_id) {
-            controller.scope.onDeviceUnSelected(data);
+            controller.scope.onTableUnSelected(data);
         }
     }
     if (type === 'Undo') {

@@ -1,30 +1,20 @@
 var fsm = require('./fsm.js');
 var button = require('./button.js');
-var util = require('./util.js');
 
-function Device(id, name, x, y, type) {
+function Table(id, name, x, y) {
     this.id = id;
     this.name = name;
     this.x = x;
     this.y = y;
-    this.height = type === "host" ? 15 : 50;
+    this.height = 50;
     this.width = 50;
-    this.type = type;
     this.selected = false;
     this.remote_selected = false;
     this.edit_label = false;
-    this.status = null;
-    this.frame = 10;
 }
-exports.Device = Device;
+exports.Table = Table;
 
-Device.prototype.incr_frame = function ( ) {
-    this.frame = this.frame + 1;
-};
-
-Device.prototype.describeArc = util.describeArc;
-
-Device.prototype.is_selected = function (x, y) {
+Table.prototype.is_selected = function (x, y) {
 
     return (x > this.x - this.width &&
             x < this.x + this.width &&
@@ -34,7 +24,7 @@ Device.prototype.is_selected = function (x, y) {
 };
 
 
-Device.prototype.toJSON = function () {
+Table.prototype.toJSON = function () {
     return {id: this.id,
             name: this.name,
             x: this.x,
@@ -44,17 +34,31 @@ Device.prototype.toJSON = function () {
 
 };
 
-function Link(from_device, to_device) {
-    this.from_device = from_device;
-    this.to_device = to_device;
+function Column(id, name, x, y, type) {
+    this.id = id;
+    this.name = name;
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.height = 50;
+    this.width = 50;
+    this.selected = false;
+    this.remote_selected = false;
+    this.edit_label = false;
+}
+exports.Column = Column;
+
+function Relation(from_column, to_column) {
+    this.from_column = from_column;
+    this.to_column = to_column;
     this.selected = false;
     this.status = null;
 }
-exports.Link = Link;
+exports.Relation = Relation;
 
-Link.prototype.toJSON = function () {
-    return {to_device: this.to_device.id,
-            from_device: this.from_device.id};
+Relation.prototype.toJSON = function () {
+    return {to_column: this.to_column.id,
+            from_column: this.from_column.id};
 };
 
 function Button(name, x, y, width, height, callback) {
