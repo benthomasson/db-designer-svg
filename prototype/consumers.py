@@ -37,14 +37,14 @@ def ws_connect(message):
     message.reply_channel.send({"text": json.dumps(["Database", database_data])})
     tables = list(Table.objects
                   .filter(database_id=database_id).values())
-    links = [dict(from_column=x['from_column__id'],
-                  to_column=x['to_column__id']) for x in list(Relation.objects
-                                                              .filter(Q(from_column__database_id=database_id) |
-                                                                      Q(to_column__database_id=database_id))
-                                                              .values('from_column__id', 'to_column__id'))]
+    relations = [dict(from_column=x['from_column__id'],
+                      to_column=x['to_column__id']) for x in list(Relation.objects
+                                                                  .filter(Q(from_column__table__database_id=database_id) |
+                                                                          Q(to_column__table__database_id=database_id))
+                                                                  .values('from_column__id', 'to_column__id'))]
     snapshot = dict(sender=0,
                     tables=tables,
-                    links=links)
+                    relations=relations)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
     history_message_ignore_types = ['TableSelected', 'TableUnSelected', 'Undo', 'Redo']
     history = list(DatabaseHistory.objects
@@ -122,13 +122,12 @@ class _Persistence(object):
             d.name = table['name']
             d.x = table['x']
             d.y = table['y']
-            d.type = table['type']
             d.save()
             table_map[table['id']] = d
 
-        for link in snapshot['links']:
-            Relation.objects.get_or_create(from_column=table_map[link['from_column']],
-                                           to_column=table_map[link['to_column']])
+        for relation in snapshot['relations']:
+            Relation.objects.get_or_create(from_column=table_map[relation['from_column']],
+                                           to_column=table_map[relation['to_column']])
 
     def onTableCreate(self, table, database_id, client_id):
         if 'sender' in table:
@@ -138,7 +137,6 @@ class _Persistence(object):
         d, _ = Table.objects.get_or_create(database_id=database_id, id=table['id'], defaults=table)
         d.x = table['x']
         d.y = table['y']
-        d.type = table['type']
         d.save()
 
     def onTableDestroy(self, table, database_id, client_id):
@@ -150,22 +148,22 @@ class _Persistence(object):
     def onTableLabelEdit(self, table, database_id, client_id):
         Table.objects.filter(database_id=database_id, id=table['id']).update(name=table['name'])
 
-    def onRelationCreate(self, link, database_id, client_id):
-        if 'sender' in link:
-            del link['sender']
-        if 'message_id' in link:
-            del link['message_id']
+    def onRelationCreate(self, relation, database_id, client_id):
+        if 'sender' in relation:
+            del relation['sender']
+        if 'message_id' in relation:
+            del relation['message_id']
         table_map = dict(Table.objects
-                         .filter(database_id=database_id, id__in=[link['from_id'], link['to_id']])
+                         .filter(database_id=database_id, id__in=[relation['from_id'], relation['to_id']])
                          .values_list('id', 'pk'))
-        Relation.objects.get_or_create(from_column_id=table_map[link['from_id']], to_column_id=table_map[link['to_id']])
+        Relation.objects.get_or_create(from_column_id=table_map[relation['from_id']], to_column_id=table_map[relation['to_id']])
 
-    def onRelationDestroy(self, link, database_id, client_id):
+    def onRelationDestroy(self, relation, database_id, client_id):
         table_map = dict(Table.objects
-                         .filter(database_id=database_id, id__in=[link['from_id'], link['to_id']])
+                         .filter(database_id=database_id, id__in=[relation['from_id'], relation['to_id']])
                          .values_list('id', 'pk'))
-        Relation.objects.filter(from_column_id=table_map[link['from_id']],
-                                to_column_id=table_map[link['to_id']]).delete()
+        Relation.objects.filter(from_column_id=table_map[relation['from_id']],
+                                to_column_id=table_map[relation['to_id']]).delete()
 
     def onTableSelected(self, message_value, database_id, client_id):
         'Ignore TableSelected messages'
@@ -207,7 +205,6 @@ class _UndoPersistence(object):
 
     def onTableDestroy(self, table, database_id, client_id):
         inverted = table.copy()
-        inverted['type'] = table['previous_type']
         inverted['name'] = table['previous_name']
         inverted['x'] = table['previous_x']
         inverted['y'] = table['previous_y']
@@ -224,11 +221,11 @@ class _UndoPersistence(object):
         inverted['name'] = table['previous_name']
         persistence.onTableLabelEdit(inverted, database_id, client_id)
 
-    def onRelationCreate(self, link, database_id, client_id):
-        persistence.onRelationDestroy(link, database_id, client_id)
+    def onRelationCreate(self, relation, database_id, client_id):
+        persistence.onRelationDestroy(relation, database_id, client_id)
 
-    def onRelationDestroy(self, link, database_id, client_id):
-        persistence.onRelationCreate(link, database_id, client_id)
+    def onRelationDestroy(self, relation, database_id, client_id):
+        persistence.onRelationCreate(relation, database_id, client_id)
 
     def onTableSelected(self, message_value, database_id, client_id):
         'Ignore TableSelected messages'
