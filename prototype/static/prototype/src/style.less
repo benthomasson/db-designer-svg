@@ -14,9 +14,6 @@
 @button-outline: #b4b6b4;
 @button-body-hover: #dfdfdf;
 @button-body-pressed: #d5d5d5;
-@green: #5CB85C;
-@red: #D9534F;
-@unknown: #D7D7D7;
 
 body {
     background-color: yellow;
@@ -108,4 +105,21 @@ svg line.debug {
 
 .button-hover text {
     fill: @button-text;
+}
+
+.table-text {
+    fill: @button-text;
+}
+
+.table-title {
+    fill: @widget-body;
+    stroke-width: 1;
+    stroke: @dark-widget-detail;
+}
+
+
+.table-title--selected {
+    fill: @selected-blue;
+    stroke-width: 1;
+    stroke: @selected-blue;
 }

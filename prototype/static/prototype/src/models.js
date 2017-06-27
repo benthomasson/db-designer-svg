@@ -16,9 +16,9 @@ exports.Table = Table;
 
 Table.prototype.is_selected = function (x, y) {
 
-    return (x > this.x - this.width &&
+    return (x > this.x &&
             x < this.x + this.width &&
-            y > this.y - this.height &&
+            y > this.y &&
             y < this.y + this.height);
 
 };

@@ -1,36 +1,23 @@
-
-            
-                     <line ng-attr-x1="{{-50 - 10}}"
-                           ng-attr-y1="0"
-                           ng-attr-x2="{{50 + 10}}"
-                           ng-attr-y2="0"
-                           ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
-                     <line ng-attr-x1="0"
-                           ng-attr-y1="{{-50 - 10}}"
-                           ng-attr-x2="0"
-                           ng-attr-y2="{{50 + 10}}"
-                           ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
-                     <rect ng-attr-x="{{-50}}"
-                           ng-attr-y="{{-50}}"
-                           ng-attr-width="{{50 * 2}}"
-                           ng-attr-height="{{50 * 2}}"
-                           ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug" />
-                    <circle
-                        cx="0"
-                        cy="0"
-                        ng-attr-r="{{50 + 2}}"
-                        ng-attr-class="{{table.selected || table.remote_selected ? table.selected && table.remote_selected ? 'selected-conflict' : table.selected ? 'selected' : 'remote-selected' : 'hidden'}}">
-                    </circle>
-                    <circle
-                        cx="0"
-                        cy="0"
-                        ng-attr-r="{{50}}">
-                    </circle>
+                    <rect
+                        x="-2"
+                        y="-2"
+                        ng-attr-width="{{table.width + 4}}"
+                        ng-attr-height="{{table.height + 4}}"
+                        ng-attr-class="{{table.selected || table.remote_selected ? table.selected && table.remote_selected ? 'table-title--selected-conflict' : table.selected ? 'table-title--selected' : 'table-title--remote-selected' : 'hidden'}}">
+                    </rect>
+                    <rect
+                        x="0"
+                        y="0"
+                        ng-attr-width="{{table.width}}"
+                        ng-attr-height="{{table.height}}"
+                        class="table-title">
+                    </rect>
                     <g ng-show="current_scale > 0.5">
-                    <text ng-attr-class="{{table.selected && ! table.edit_label ? 'selected' : 'hidden'}}"
+                    <text ng-attr-class="{{table.selected && ! table.edit_label ? 'table-text--selected' : 'hidden'}}"
 						  filter="url(#selected)"
                           text-anchor="middle"
-						  x="0"
-						  y="75"> {{table.name}} </text>
-                    <text text-anchor="middle" x="0" y="75">{{table.name}}{{table.edit_label?'_':''}}</text>
+                          ng-attr-x="{{table.width/2}}"
+                          ng-attr-y="{{table.height/2}}"
+                          dy=".2em"> {{table.name}} </text>
+                    <text class="table-text" text-anchor="middle" dy=".2em" ng-attr-x="{{table.width/2}}" ng-attr-y="{{table.height/2}}">{{table.name}}{{table.edit_label?'_':''}}</text>
                     </g>
