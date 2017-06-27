@@ -40,8 +40,8 @@ admin.site.register(Client, ClientAdmin)
 
 
 class DatabaseHistoryAdmin(admin.ModelAdmin):
-    fields = ('topology', 'client', 'message_type', 'message_id', 'message_data', 'undone',)
-    raw_id_fields = ('topology', 'client', 'message_type',)
+    fields = ('database', 'client', 'message_type', 'message_id', 'message_data', 'undone',)
+    raw_id_fields = ('database', 'client', 'message_type',)
 
 
 admin.site.register(DatabaseHistory, DatabaseHistoryAdmin)

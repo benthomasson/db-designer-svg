@@ -50,7 +50,7 @@ models:
   - name: database_history_id
     pk: true
     type: AutoField
-  - name: topology
+  - name: database
     ref: Database
     ref_field: database_id
     type: ForeignKey

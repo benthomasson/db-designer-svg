@@ -34,7 +34,7 @@ class Client(models.Model):
 class DatabaseHistory(models.Model):
 
     database_history_id = models.AutoField(primary_key=True,)
-    topology = models.ForeignKey('Database',)
+    database = models.ForeignKey('Database',)
     client = models.ForeignKey('Client',)
     message_type = models.ForeignKey('MessageType',)
     message_id = models.IntegerField()
