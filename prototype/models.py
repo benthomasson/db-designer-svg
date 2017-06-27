@@ -1,30 +1,22 @@
 from django.db import models
 
 
-class Device(models.Model):
+class Table(models.Model):
 
-    device_id = models.AutoField(primary_key=True,)
-    topology = models.ForeignKey('Topology',)
+    table_id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=200, )
     x = models.IntegerField()
     y = models.IntegerField()
     id = models.IntegerField()
-    type = models.CharField(max_length=200, )
+    database = models.ForeignKey('Database',)
 
     def __unicode__(self):
         return self.name
 
 
-class Link(models.Model):
+class Database(models.Model):
 
-    link_id = models.AutoField(primary_key=True,)
-    from_device = models.ForeignKey('Device',  related_name='+', )
-    to_device = models.ForeignKey('Device',  related_name='+', )
-
-
-class Topology(models.Model):
-
-    topology_id = models.AutoField(primary_key=True,)
+    database_id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=200, )
     scale = models.FloatField()
     panX = models.FloatField()
@@ -39,10 +31,10 @@ class Client(models.Model):
     client_id = models.AutoField(primary_key=True,)
 
 
-class TopologyHistory(models.Model):
+class DatabaseHistory(models.Model):
 
-    topology_history_id = models.AutoField(primary_key=True,)
-    topology = models.ForeignKey('Topology',)
+    database_history_id = models.AutoField(primary_key=True,)
+    topology = models.ForeignKey('Database',)
     client = models.ForeignKey('Client',)
     message_type = models.ForeignKey('MessageType',)
     message_id = models.IntegerField()
@@ -57,3 +49,24 @@ class MessageType(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class Column(models.Model):
+
+    column_id = models.AutoField(primary_key=True,)
+    id = models.IntegerField()
+    name = models.CharField(max_length=200, )
+    type = models.CharField(max_length=200, )
+    table = models.ForeignKey('Table',)
+    is_pk = models.BooleanField(default=False)
+    is_unique = models.BooleanField(default=False)
+    has_default = models.BooleanField(default=False)
+    default_value = models.TextField()
+    is_indexed = models.BooleanField(default=False)
+
+
+class Relation(models.Model):
+
+    relation_id = models.AutoField(primary_key=True,)
+    from_column = models.ForeignKey('Column',  related_name='+', )
+    to_column = models.ForeignKey('Column',  related_name='+', )

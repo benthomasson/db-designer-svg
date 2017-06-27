@@ -1,40 +1,34 @@
 from django.contrib import admin
 
-from prototype.models import Device
+from prototype.models import Table
 
-from prototype.models import Link
-
-from prototype.models import Topology
+from prototype.models import Database
 
 from prototype.models import Client
 
-from prototype.models import TopologyHistory
+from prototype.models import DatabaseHistory
 
 from prototype.models import MessageType
 
+from prototype.models import Column
 
-class DeviceAdmin(admin.ModelAdmin):
-    fields = ('topology', 'name', 'x', 'y', 'id', 'type',)
-    raw_id_fields = ('topology',)
-
-
-admin.site.register(Device, DeviceAdmin)
+from prototype.models import Relation
 
 
-class LinkAdmin(admin.ModelAdmin):
-    fields = ('from_device', 'to_device',)
-    raw_id_fields = ('from_device', 'to_device',)
+class TableAdmin(admin.ModelAdmin):
+    fields = ('name', 'x', 'y', 'id', 'database',)
+    raw_id_fields = ('database',)
 
 
-admin.site.register(Link, LinkAdmin)
+admin.site.register(Table, TableAdmin)
 
 
-class TopologyAdmin(admin.ModelAdmin):
+class DatabaseAdmin(admin.ModelAdmin):
     fields = ('name', 'scale', 'panX', 'panY',)
     raw_id_fields = ()
 
 
-admin.site.register(Topology, TopologyAdmin)
+admin.site.register(Database, DatabaseAdmin)
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -45,12 +39,12 @@ class ClientAdmin(admin.ModelAdmin):
 admin.site.register(Client, ClientAdmin)
 
 
-class TopologyHistoryAdmin(admin.ModelAdmin):
+class DatabaseHistoryAdmin(admin.ModelAdmin):
     fields = ('topology', 'client', 'message_type', 'message_id', 'message_data', 'undone',)
     raw_id_fields = ('topology', 'client', 'message_type',)
 
 
-admin.site.register(TopologyHistory, TopologyHistoryAdmin)
+admin.site.register(DatabaseHistory, DatabaseHistoryAdmin)
 
 
 class MessageTypeAdmin(admin.ModelAdmin):
@@ -59,3 +53,19 @@ class MessageTypeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(MessageType, MessageTypeAdmin)
+
+
+class ColumnAdmin(admin.ModelAdmin):
+    fields = ('id', 'name', 'type', 'table', 'is_pk', 'is_unique', 'has_default', 'default_value', 'is_indexed',)
+    raw_id_fields = ('table',)
+
+
+admin.site.register(Column, ColumnAdmin)
+
+
+class RelationAdmin(admin.ModelAdmin):
+    fields = ('from_column', 'to_column',)
+    raw_id_fields = ('from_column', 'to_column',)
+
+
+admin.site.register(Relation, RelationAdmin)

@@ -1,15 +1,11 @@
-app: prototype
+app: models
 external_models: []
 models:
 - display: name
   fields:
-  - name: device_id
+  - name: table_id
     pk: true
     type: AutoField
-  - name: topology
-    ref: Topology
-    ref_field: topology_id
-    type: ForeignKey
   - len: 200
     name: name
     type: CharField
@@ -19,32 +15,16 @@ models:
     type: IntegerField
   - name: id
     type: IntegerField
-  - len: 200
-    name: type
-    type: CharField
-  name: Device
+  - name: database
+    ref: Database
+    ref_field: database_id
+    type: ForeignKey
+  name: Table
   x: 348
   y: 124
-- fields:
-  - name: link_id
-    pk: true
-    type: AutoField
-  - name: from_device
-    ref: Device
-    ref_field: device_id
-    related_name: +
-    type: ForeignKey
-  - name: to_device
-    ref: Device
-    ref_field: device_id
-    related_name: +
-    type: ForeignKey
-  name: Link
-  x: 591
-  y: 128
 - display: name
   fields:
-  - name: topology_id
+  - name: database_id
     pk: true
     type: AutoField
   - len: 200
@@ -56,7 +36,7 @@ models:
     type: FloatField
   - name: panY
     type: FloatField
-  name: Topology
+  name: Database
   x: 111
   y: 127
 - fields:
@@ -67,12 +47,12 @@ models:
   x: -455
   y: 109
 - fields:
-  - name: topology_history_id
+  - name: database_history_id
     pk: true
     type: AutoField
   - name: topology
-    ref: Topology
-    ref_field: topology_id
+    ref: Database
+    ref_field: database_id
     type: ForeignKey
   - name: client
     ref: Client
@@ -89,7 +69,7 @@ models:
   - default: false
     name: undone
     type: BooleanField
-  name: TopologyHistory
+  name: DatabaseHistory
   x: -205
   y: 282
 - display: name
@@ -103,8 +83,58 @@ models:
   name: MessageType
   x: -509
   y: 383
+- fields:
+  - name: column_id
+    pk: true
+    type: AutoField
+  - name: id
+    type: IntegerField
+  - len: 200
+    name: name
+    type: CharField
+  - len: 200
+    name: type
+    type: CharField
+  - name: table
+    ref: Table
+    ref_field: table_id
+    type: ForeignKey
+  - default: false
+    name: is_pk
+    type: BooleanField
+  - default: false
+    name: is_unique
+    type: BooleanField
+  - default: false
+    name: has_default
+    type: BooleanField
+  - name: default_value
+    type: TextField
+  - default: false
+    name: is_indexed
+    type: BooleanField
+  name: Column
+  x: 581
+  y: 120
+- fields:
+  - name: relation_id
+    pk: true
+    type: AutoField
+  - name: from_column
+    ref: Column
+    ref_field: column_id
+    related_name: +
+    type: ForeignKey
+  - name: to_column
+    ref: Column
+    ref_field: column_id
+    related_name: +
+    type: ForeignKey
+  name: Relation
+  x: 839
+  y: 124
 modules: []
 view:
-  panX: 642.7150627655888
-  panY: 193.7947851815995
-  scaleXY: 0.6900000000000002
+  panX: 483.1323805337661
+  panY: 157.08722580467725
+  scaleXY: 0.6500000000000001
