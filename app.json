@@ -1,5 +1,5 @@
 {
-  "name": "ansible-network-ui",
+  "name": "db-designer-svg",
   "description": "A prototype of a UI for networking visualization for Ansible Tower.",
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-python",

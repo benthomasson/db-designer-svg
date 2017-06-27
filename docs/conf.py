@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ansible-network-ui documentation build configuration file, created by
+# db-designer-svg documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ansible-network-ui'
+project = u'db-designer-svg'
 copyright = u"2017, Ansible Inc."
 
 # The version info for the project you're documenting, acts as replacement for
@@ -165,7 +165,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ansible-network-uidoc'
+htmlhelp_basename = 'db-designer-svg'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -185,8 +185,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index',
-     'ansible-network-ui.tex',
-     u'ansible-network-ui Documentation',
+     'db-designer-svg.tex',
+     u'db-designer-svg Documentation',
      u"Ansible Inc.", 'manual'),
 ]
 
@@ -216,7 +216,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'ansible-network-ui', u'ansible-network-ui Documentation',
+    ('index', 'db-designer-svg', u'db-designer-svg Documentation',
      [u"Ansible Inc."], 1)
 ]
 
@@ -230,8 +230,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'ansible-network-ui', u'ansible-network-ui Documentation',
-     u"Ansible Inc.", 'ansible-network-ui',
+    ('index', 'db-designer-svg', u'db-designer-svg Documentation',
+     u"Ansible Inc.", 'db-designer-svg',
      'A prototype of a UI for networking visualization for Ansible Tower.', 'Miscellaneous'),
 ]
 

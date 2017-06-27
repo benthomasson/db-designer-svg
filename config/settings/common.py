@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Django settings for ansible-network-ui project.
+Django settings for db-designer-svg project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
@@ -13,7 +13,7 @@ from __future__ import absolute_import, unicode_literals
 import environ
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
-APPS_DIR = ROOT_DIR.path('ansible-network-ui')
+APPS_DIR = ROOT_DIR.path('db-designer-svg')
 
 env = environ.Env()
 
@@ -44,7 +44,7 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    'ansible-network-ui.users',  # custom users app
+    'db-designer-svg.users',  # custom users app
     # Your stuff: custom apps go here
     'myapp',
     'prototype',
@@ -68,7 +68,7 @@ MIDDLEWARE_CLASSES = (
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
 MIGRATION_MODULES = {
-    'sites': 'ansible-network-ui.contrib.sites.migrations'
+    'sites': 'db-designer-svg.contrib.sites.migrations'
 }
 
 # DEBUG
@@ -102,7 +102,7 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db("DATABASE_URL", default="postgres:///ansible-network-ui"),
+    'default': env.db("DATABASE_URL", default="postgres:///db-designer-svg"),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -225,7 +225,7 @@ LOGIN_URL = 'account_login'
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
 ########## CELERY
-INSTALLED_APPS += ('ansible-network-ui.taskapp.celery.CeleryConfig',)
+INSTALLED_APPS += ('db-designer-svg.taskapp.celery.CeleryConfig',)
 # if you are not using the django database broker (e.g. rabbitmq, redis, memcached), you can remove the next line.
 INSTALLED_APPS += ('kombu.transport.django',)
 BROKER_URL = env("CELERY_BROKER_URL", default='django://')

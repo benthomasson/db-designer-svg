@@ -2,7 +2,7 @@
 Git Repositories
 ----------------
 
-* UI and Django: git@github.com:benthomasson/ansible-network-ui.git
+* UI and Django: git@github.com:benthomasson/db-designer-svg.git
 * UI only: git@github.com:benthomasson/svg-test.git
 
 

@@ -77,17 +77,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/ansible-network-ui.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/db-designer-svg.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/ansible-network-ui.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/db-designer-svg.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/ansible-network-ui"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/ansible-network-ui"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/db-designer-svg"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/db-designer-svg"
 	@echo "# devhelp"
 
 epub:

@@ -1,9 +1,9 @@
-.. ansible-network-ui documentation master file, created by
+.. db-designer-svg documentation master file, created by
    sphinx-quickstart.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ansible-network-ui's documentation!
+Welcome to db-designer-svg's documentation!
 ====================================================================
 
 Contents:

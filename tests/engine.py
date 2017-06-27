@@ -40,12 +40,12 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
             shutdown_timeout=float(self.settings["shutdown_timeout"]),
         )
 
-        postgres_user = hitchpostgres.PostgresUser("ansible-network-ui", "password")
+        postgres_user = hitchpostgres.PostgresUser("db-designer-svg", "password")
 
         self.services['Postgres'] = hitchpostgres.PostgresService(
             postgres_package=postgres_package,
             users=[postgres_user, ],
-            databases=[hitchpostgres.PostgresDatabase("ansible-network-ui", postgres_user), ]
+            databases=[hitchpostgres.PostgresDatabase("db-designer-svg", postgres_user), ]
         )
 
         self.services['HitchSMTP'] = hitchsmtp.HitchSMTPService(port=1025)
@@ -65,7 +65,7 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
 
         self.services['Celery'] = hitchpython.CeleryService(
             python=python_package.python,
-            app="ansible-network-ui.taskapp", loglevel="INFO",
+            app="db-designer-svg.taskapp", loglevel="INFO",
             needs=[
                 self.services['Redis'], self.services['Django'],
             ],

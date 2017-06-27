@@ -1,7 +1,7 @@
 postgres:
   image: postgres:9.4
   volumes:
-    - /data/ansible-network-ui/postgres:/var/lib/postgresql/data
+      - /data/db-designer-svg/postgres:/var/lib/postgresql/data
   env_file: .env
 
 django:
@@ -30,7 +30,7 @@ celeryworker:
   links:
    - postgres
    - redis
-  command: celery -A ansible-network-ui.taskapp worker -l INFO
+  command: celery -A db-designer-svg.taskapp worker -l INFO
 
 celerybeat:
   build: .
@@ -39,4 +39,4 @@ celerybeat:
   links:
     - postgres
     - redis
-  command: celery -A ansible-network-ui.taskapp beat -l INFO
+  command: celery -A db-designer-svg.taskapp beat -l INFO

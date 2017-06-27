@@ -56,7 +56,7 @@ node_modules/
 .env
 
 # User-uploaded media
-ansible-network-ui/media/
+db-designer-svg/media/
 
 # Hitch directory
 tests/.hitch

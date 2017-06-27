@@ -11,11 +11,11 @@ if not settings.configured:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")  # pragma: no cover
 
 
-app = Celery('ansible-network-ui')
+app = Celery('db-designer-svg')
 
 
 class CeleryConfig(AppConfig):
-    name = 'ansible-network-ui.taskapp'
+    name = 'db-designer-svg.taskapp'
     verbose_name = 'Celery Config'
 
     def ready(self):

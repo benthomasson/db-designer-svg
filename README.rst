@@ -1,4 +1,4 @@
-ansible-network-ui
+db-designer-svg
 ==============================
 
 A prototype of a UI for networking visualization for Ansible Tower.
@@ -54,8 +54,8 @@ To run a celery worker:
 
 .. code-block:: bash
 
-    cd ansible-network-ui
-    celery -A ansible-network-ui.taskapp worker -l info
+    cd db-designer-svg
+    celery -A db-designer-svg.taskapp worker -l info
 
 Please note: For Celerys import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
 
@@ -77,7 +77,7 @@ To install the test runner::
 
   $ pip install hitch
 
-To run the tests, enter the ansible-network-ui/tests directory and run the following commands::
+To run the tests, enter the db-designer-svg/tests directory and run the following commands::
 
   $ hitch init
 
