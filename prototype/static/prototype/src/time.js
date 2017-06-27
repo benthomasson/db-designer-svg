@@ -249,8 +249,8 @@ _Present.prototype.onMessage = function(controller, message) {
     if (type === 'id') {
         controller.scope.onClientId(data);
     }
-    if (type === 'Topology') {
-        controller.scope.onTopology(data);
+    if (type === 'Database') {
+        controller.scope.onDatabase(data);
     }
     if (type === 'History') {
         controller.scope.onHistory(data);

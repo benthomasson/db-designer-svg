@@ -31,30 +31,8 @@
             </g>
             <g ng-repeat="table in tables"
                ng-attr-transform="translate({{table.x}},{{table.y}})"
-               ng-attr-class="{{table.type}}"
-               ng-switch on="table.type">
-               <g ng-switch-when="router"><!-- begin router -->
-                   <g router></g>
-               </g> <!-- end router -->
-
-               <g ng-switch-when="switch"> <!-- begin switch -->
-                   <g switch> </g>
-               </g> <!-- end switch -->
-
-               <g ng-switch-when="host"> <!-- begin host -->
-                    <g host> </g>
-
-               </g> <!-- end host -->
-
-               <g ng-switch-when="rack"> <!-- begin rack -->
-                    <g rack> </g>
-               </g> <!-- end rack -->
-
-               <g ng-switch-default> <!-- begin default -->
-                    <g default></g>
-
-               </g> <!-- end default -->
-               <g status-light></g>
+               ng-attr-class="table">
+               <g table></g>
             </g>
             <g ng-attr-transform="translate({{scaledX}},{{scaledY}})" ng-attr-class="{{debug.hidden && 'hidden' || ''}} debug-cursor" >
                 <line x1="-5" y1="0" x2="5" y2="0"/>

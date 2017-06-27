@@ -13,9 +13,9 @@ var messages = require('./messages.js');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
-  $scope.topology_id = $location.search().topology_id || 0;
+  $scope.database_id = $location.search().database_id || 0;
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?topology_id=" + $scope.topology_id,
+  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?database_id=" + $scope.database_id,
                                                            null,
                                                            {debug: false, reconnectInterval: 300});
   $scope.history = [];
@@ -448,12 +448,12 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.client_id = data;
     };
 
-    $scope.onTopology = function(data) {
-        $scope.topology_id = data.topology_id;
+    $scope.onDatabase = function(data) {
+        $scope.database_id = data.database_id;
         $scope.panX = data.panX;
         $scope.panY = data.panX;
         $scope.current_scale = data.scale;
-        $location.search({topology_id: data.topology_id});
+        $location.search({database_id: data.database_id});
     };
 
     $scope.onTableSelected = function(data) {
@@ -580,6 +580,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
 
     $scope.control_socket.onmessage = function(message) {
+        console.log(message.data);
         $scope.first_controller.state.onMessage($scope.first_controller, message);
         $scope.$apply();
     };
