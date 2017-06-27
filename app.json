@@ -1,6 +1,6 @@
 {
   "name": "db-designer-svg",
-  "description": "A prototype of a UI for networking visualization for Ansible Tower.",
+  "description": "A tool for designing database schemas",
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-python",
     "DJANGO_SETTINGS_MODULE": "config.settings.production",

@@ -1,7 +1,7 @@
 db-designer-svg
 ==============================
 
-A prototype of a UI for networking visualization for Ansible Tower.
+A tool for designing database schemas.
 
 
 LICENSE: BSD

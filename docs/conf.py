@@ -232,7 +232,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'db-designer-svg', u'db-designer-svg Documentation',
      u"Ansible Inc.", 'db-designer-svg',
-     'A prototype of a UI for networking visualization for Ansible Tower.', 'Miscellaneous'),
+     "A tool for designing database schemas")
 ]
 
 # Documents to append as an appendix to all manuals.
