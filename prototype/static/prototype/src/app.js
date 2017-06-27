@@ -64,23 +64,9 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.frame = 0;
 
 
-  $scope.tables = [
-  ];
+  $scope.tables = [];
 
-  $scope.stencils = [
-    {"name": "router", "size":50, 'x':10, 'y':100},
-    {"name": "switch", "size":50, 'x':10, 'y':160},
-    {"name": "rack", "size":50, 'x':10, 'y':220},
-  ];
-
-  $scope.layers = [
-    {"name": "Layer 3", "size":60, 'x':window.innerWidth - 70, 'y':10},
-    {"name": "Layer 2", "size":60, 'x':window.innerWidth - 70, 'y':80},
-    {"name": "Layer 1", "size":60, 'x':window.innerWidth - 70, 'y':150},
-  ];
-
-  $scope.relations = [
-  ];
+  $scope.relations = [];
 
 
 
@@ -268,9 +254,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     // Buttons
 
-    $scope.buttons = [
-      new models.Button("Deploy", 10, 10, 60, 50, $scope.onDeployButton)
-    ];
+    $scope.buttons = [];
 
 
 
@@ -645,48 +629,20 @@ app.directive('debug', function() {
   return { restrict: 'A', templateUrl: 'widgets/debug.html' };
 });
 
-app.directive('router', function() {
-  return { restrict: 'A', templateUrl: 'widgets/router.html' };
-});
-
-app.directive('switch', function() {
-  return { restrict: 'A', templateUrl: 'widgets/switch.html' };
-});
-
-app.directive('host', function() {
-  return { restrict: 'A', templateUrl: 'widgets/host.html' };
-});
-
 app.directive('relation', function() {
   return { restrict: 'A', templateUrl: 'widgets/relation.html' };
 });
 
-app.directive('rack', function() {
-  return { restrict: 'A', templateUrl: 'widgets/rack.html' };
-});
-
-app.directive('default', function() {
-  return { restrict: 'A', templateUrl: 'widgets/default.html' };
+app.directive('table', function() {
+  return { restrict: 'A', templateUrl: 'widgets/table.html' };
 });
 
 app.directive('quadrants', function() {
   return { restrict: 'A', templateUrl: 'widgets/quadrants.html' };
 });
 
-app.directive('stencil', function() {
-  return { restrict: 'A', templateUrl: 'widgets/stencil.html' };
-});
-
-app.directive('layer', function() {
-  return { restrict: 'A', templateUrl: 'widgets/layer.html' };
-});
-
 app.directive('button', function() {
   return { restrict: 'A', templateUrl: 'widgets/button.html' };
-});
-
-app.directive('statusLight', function() {
-  return { restrict: 'A', templateUrl: 'widgets/status_light.html' };
 });
 
 

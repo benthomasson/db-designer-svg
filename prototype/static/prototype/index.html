@@ -71,22 +71,6 @@
                     <g button></g>
                 </g>
             </g> <!-- end buttons -->
-
-            <g> <!-- stencils -->
-                <g ng-repeat="stencil in stencils"
-                   ng-attr-transform="translate({{stencil.x}},{{stencil.y}})"
-                   class="button">
-                    <g stencil></g>
-                </g>
-            </g> <!-- end stencils -->
-
-            <g> <!-- layers -->
-                <g ng-repeat="layer in layers"
-                   ng-attr-transform="translate({{layer.x}},{{layer.y}})"
-                   class="button">
-                    <g layer> </g>
-                </g>
-            </g> <!-- end layers -->
         </g>
         <g debug></g>
         <g cursor></g>

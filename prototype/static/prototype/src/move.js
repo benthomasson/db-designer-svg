@@ -93,33 +93,11 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
 	var scope = controller.scope;
     var table = null;
 
-	if ($event.key === 'r') {
+	if ($event.key === 't') {
 		table = new models.Table(controller.scope.table_id_seq(),
-                                   "Router",
-                                   scope.scaledX,
-                                   scope.scaledY,
-                                   "router");
-	}
-    else if ($event.key === 's') {
-		table = new models.Table(controller.scope.table_id_seq(),
-                                   "Switch",
-                                   scope.scaledX,
-                                   scope.scaledY,
-                                   "switch");
-	}
-    else if ($event.key === 'a') {
-		table = new models.Table(controller.scope.table_id_seq(),
-                                   "Rack",
-                                   scope.scaledX,
-                                   scope.scaledY,
-                                   "rack");
-	}
-    else if ($event.key === 'h') {
-		table = new models.Table(controller.scope.table_id_seq(),
-                                   "Host",
-                                   scope.scaledX,
-                                   scope.scaledY,
-                                   "host");
+                                 "New",
+                                 scope.scaledX,
+                                 scope.scaledY);
 	}
 
     if (table !== null) {

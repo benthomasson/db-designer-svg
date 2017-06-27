@@ -1,7 +1,0 @@
-<circle ng-attr-class="{{table.status === null ? 'hidden' : table.status ? 'pass' : 'fail'}}"
-    ng-attr-cx="{{-table.width}}"
-    ng-attr-cy="{{-table.height}}"
-    ng-attr-r="{{10}}"></circle>
-<g ng-if="table.working">
-    <path ng-attr-transform="translate({{-table.width}}, {{-table.height}}) rotate({{frame/2 % 360}})" id="arc1" ng-attr-class="working" ng-attr-d="{{table.describeArc(0, 0, 10, 0, 270)}}"></path>
-</g>
