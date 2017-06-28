@@ -19,6 +19,9 @@ models:
     ref: Database
     ref_field: database_id
     type: ForeignKey
+  - default: 0
+    name: column_id_seq
+    type: IntegerField
   name: Table
   x: 348
   y: 124
@@ -36,6 +39,9 @@ models:
     type: FloatField
   - name: panY
     type: FloatField
+  - default: 0
+    name: table_id_seq
+    type: IntegerField
   name: Database
   x: 111
   y: 127
@@ -114,8 +120,8 @@ models:
     name: is_indexed
     type: BooleanField
   name: Column
-  x: 581
-  y: 120
+  x: 619
+  y: 128
 - fields:
   - name: relation_id
     pk: true
@@ -131,10 +137,10 @@ models:
     related_name: +
     type: ForeignKey
   name: Relation
-  x: 839
-  y: 124
+  x: 880
+  y: 132
 modules: []
 view:
-  panX: 483.1323805337661
-  panY: 157.08722580467725
-  scaleXY: 0.6500000000000001
+  panX: 545.3656311541137
+  panY: 311.082263025521
+  scaleXY: 0.6200000000000001

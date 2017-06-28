@@ -16,7 +16,7 @@ from prototype.models import Relation
 
 
 class TableAdmin(admin.ModelAdmin):
-    fields = ('name', 'x', 'y', 'id', 'database',)
+    fields = ('name', 'x', 'y', 'id', 'database', 'column_id_seq',)
     raw_id_fields = ('database',)
 
 
@@ -24,7 +24,7 @@ admin.site.register(Table, TableAdmin)
 
 
 class DatabaseAdmin(admin.ModelAdmin):
-    fields = ('name', 'scale', 'panX', 'panY',)
+    fields = ('name', 'scale', 'panX', 'panY', 'table_id_seq',)
     raw_id_fields = ()
 
 

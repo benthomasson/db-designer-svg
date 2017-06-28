@@ -9,6 +9,7 @@ class Table(models.Model):
     y = models.IntegerField()
     id = models.IntegerField()
     database = models.ForeignKey('Database',)
+    column_id_seq = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -21,6 +22,7 @@ class Database(models.Model):
     scale = models.FloatField()
     panX = models.FloatField()
     panY = models.FloatField()
+    table_id_seq = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
