@@ -37,6 +37,11 @@ def ws_connect(message):
     message.reply_channel.send({"text": json.dumps(["Database", database_data])})
     tables = list(Table.objects
                   .filter(database_id=database_id).values())
+    columns = list(Column.objects
+                   .filter(table__database_id=database_id).values('id',
+                                                                  'name',
+                                                                  'type',
+                                                                  'table__id'))
     relations = [dict(from_column=x['from_column__id'],
                       to_column=x['to_column__id']) for x in list(Relation.objects
                                                                   .filter(Q(from_column__table__database_id=database_id) |
@@ -44,6 +49,7 @@ def ws_connect(message):
                                                                   .values('from_column__id', 'to_column__id'))]
     snapshot = dict(sender=0,
                     tables=tables,
+                    columns=columns,
                     relations=relations)
     message.reply_channel.send({"text": json.dumps(["Snapshot", snapshot])})
     history_message_ignore_types = ['TableSelected', 'TableUnSelected', 'Undo', 'Redo']
@@ -53,7 +59,7 @@ def ws_connect(message):
                                   .exclude(undone=True)
                                   .order_by('pk')
                                   .values_list('message_data', flat=True)[:1000])
-    message.reply_channel.send({"text": json.dumps(["History", history])})
+    #message.reply_channel.send({"text": json.dumps(["History", history])})
 
 
 @channel_session
@@ -147,6 +153,22 @@ class _Persistence(object):
 
     def onTableLabelEdit(self, table, database_id, client_id):
         Table.objects.filter(database_id=database_id, id=table['id']).update(name=table['name'])
+
+    def onColumnCreate(self, column, database_id, client_id):
+        if 'sender' in column:
+            del column['sender']
+        if 'message_id' in column:
+            del column['message_id']
+        t = Table.objects.get(database_id=database_id, id=column['table_id'])
+        if 'table_id' in column:
+            del column['table_id']
+        Column.objects.get_or_create(table=t,
+                                     id=column['id'],
+                                     defaults=column)
+
+    def onColumnLabelEdit(self, column, database_id, client_id):
+        t = Table.objects.filter(database_id=database_id, id=column['table_id'])
+        Column.objects.filter(table=t, id=column['id']).update(name=column['name'])
 
     def onRelationCreate(self, relation, database_id, client_id):
         if 'sender' in relation:

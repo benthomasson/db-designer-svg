@@ -2,6 +2,7 @@ var inherits = require('inherits');
 var fsm = require('./fsm.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
+var snake = require('to-snake-case');
 
 function _State () {
 }
@@ -75,11 +76,18 @@ inherits(_EditLabel, _State);
 var EditLabel = new _EditLabel();
 exports.EditLabel = EditLabel;
 
+function _EditColumnLabel () {
+    this.name = 'EditColumnLabel';
+}
+inherits(_EditColumnLabel, _State);
+var EditColumnLabel = new _EditColumnLabel();
+exports.EditColumnLabel = EditColumnLabel;
+
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
-    var last_selected_table = controller.scope.select_tables($event.shiftKey);
+    var selection = controller.scope.select_items($event.shiftKey);
 
-    if (last_selected_table !== null) {
+    if (selection.last_selected_table !== null) {
         controller.changeState(Selected1);
     } else {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
@@ -126,8 +134,8 @@ _Selected2.prototype.onMouseDown = function (controller, $event) {
 
     if (controller.scope.selected_tables.length === 1) {
         var current_selected_table = controller.scope.selected_tables[0];
-        var last_selected_table = controller.scope.select_tables($event.shiftKey);
-        if (current_selected_table === last_selected_table) {
+        var selection = controller.scope.select_items($event.shiftKey);
+        if (current_selected_table === selection.last_selected_table) {
             controller.changeState(Selected3);
             return;
         }
@@ -228,9 +236,13 @@ _Move.prototype.onMouseUp = function (controller, $event) {
 _Move.prototype.onMouseUp.transitions = ['Selected2'];
 
 _Selected3.prototype.onMouseUp = function (controller) {
-    controller.changeState(EditLabel);
+    if (controller.scope.selected_columns.length > 0) {
+        controller.changeState(EditColumnLabel);
+    } else {
+        controller.changeState(EditLabel);
+    }
 };
-_Selected3.prototype.onMouseUp.transitions = ['EditLabel'];
+_Selected3.prototype.onMouseUp.transitions = ['EditLabel', 'EditColumnLabel'];
 
 
 _Selected3.prototype.onMouseMove = function (controller) {
@@ -244,7 +256,21 @@ _EditLabel.prototype.start = function (controller) {
 };
 
 _EditLabel.prototype.end = function (controller) {
-    controller.scope.selected_tables[0].edit_label = false;
+    var table = controller.scope.selected_tables[0];
+    table.edit_label = false;
+    if (table.columns.length === 0) {
+        var new_column = new models.Column(table,
+                                           table.column_id_seq(),
+                                           snake(table.name) + "_id", 0, 0, "");
+
+        table.columns.push(new_column);
+        controller.scope.send_control_message(new messages.ColumnCreate(controller.scope.client_id,
+                                                                        new_column.id,
+                                                                        table.id,
+                                                                        new_column.name,
+                                                                        new_column.type));
+    }
+    table.update_positions();
 };
 
 _EditLabel.prototype.onMouseDown = function (controller, $event) {
@@ -274,5 +300,48 @@ _EditLabel.prototype.onKeyDown = function (controller, $event) {
                                                                        table.id,
                                                                        table.name,
                                                                        previous_name));
+    table.update_positions();
 };
 _EditLabel.prototype.onKeyDown.transitions = ['Selected2'];
+
+_EditColumnLabel.prototype.start = function (controller) {
+    controller.scope.selected_columns[0].edit_label = true;
+};
+
+_EditColumnLabel.prototype.end = function (controller) {
+    var column = controller.scope.selected_columns[0];
+    column.edit_label = false;
+    column.table.update_positions();
+};
+
+_EditColumnLabel.prototype.onMouseDown = function (controller, $event) {
+
+    controller.changeState(Ready);
+    controller.state.onMouseDown(controller, $event);
+
+};
+_EditColumnLabel.prototype.onMouseDown.transitions = ['Ready'];
+
+
+_EditColumnLabel.prototype.onKeyDown = function (controller, $event) {
+    //Key codes found here:
+    //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+	var column = controller.scope.selected_columns[0];
+    var previous_name = column.name;
+	if ($event.keyCode === 8 || $event.keyCode === 46) { //Delete
+		column.name = column.name.slice(0, -1);
+	} else if ($event.keyCode >= 48 && $event.keyCode <=90) { //Alphanumeric
+        column.name += $event.key;
+	} else if ($event.keyCode >= 186 && $event.keyCode <=222) { //Punctuation
+        column.name += $event.key;
+	} else if ($event.keyCode === 13) { //Enter
+        controller.changeState(Selected2);
+    }
+    controller.scope.send_control_message(new messages.ColumnLabelEdit(controller.scope.client_id,
+                                                                       column.table.id,
+                                                                       column.id,
+                                                                       column.name,
+                                                                       previous_name));
+    column.table.update_positions();
+};
+_EditColumnLabel.prototype.onKeyDown.transitions = ['Selected2'];

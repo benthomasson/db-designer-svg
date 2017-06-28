@@ -40,6 +40,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.lastPanX = 0;
   $scope.lastPanY = 0;
   $scope.selected_tables = [];
+  $scope.selected_columns = [];
   $scope.selected_relations = [];
   $scope.new_relation = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
@@ -123,6 +124,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var tables = $scope.tables;
         var relations = $scope.relations;
         $scope.selected_tables = [];
+        $scope.selected_columns = [];
         $scope.selected_relations = [];
         for (i = 0; i < tables.length; i++) {
             if (tables[i].selected) {
@@ -135,11 +137,13 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
     };
 
-    $scope.select_tables = function (multiple_selection) {
+    $scope.select_items = function (multiple_selection) {
 
         var i = 0;
+        var j = 0;
         var tables = $scope.tables;
         var last_selected_table = null;
+        var last_selected_column = null;
 
         $scope.pressedX = $scope.mouseX;
         $scope.pressedY = $scope.mouseY;
@@ -162,8 +166,26 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                     break;
                 }
             }
+            for (j = 0; j < tables[i].columns.length; j++) {
+                if(tables[i].columns[j].is_selected($scope.scaledX, $scope.scaledY)) {
+                    tables[i].selected = true;
+                    $scope.send_control_message(new messages.TableSelected($scope.client_id, tables[i].id));
+                    last_selected_table = tables[i];
+                    last_selected_column = tables[i].columns[j];
+                    if ($scope.selected_tables.indexOf(tables[i]) === -1) {
+                        $scope.selected_tables.push(tables[i]);
+                    }
+                    if ($scope.selected_columns.indexOf(tables[i].columns[j]) === -1) {
+                        $scope.selected_columns.push(tables[i].columns[j]);
+                    }
+                    if (!multiple_selection) {
+                        break;
+                    }
+                }
+            }
         }
-        return last_selected_table;
+        return {last_selected_table: last_selected_table,
+                last_selected_column: last_selected_column};
     };
 
     $scope.forget_time = function () {
@@ -529,6 +551,19 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             table_map[table.id] = new_table;
         }
 
+        //Build the columns
+        var column = null;
+
+        for (i = 0; i < data.columns.length; i++) {
+            column = data.columns[i];
+            table_map[column.table__id].columns.push(new models.Column(table_map[column.table__id],
+                                                                      column.id,
+                                                                      column.name,
+                                                                      column.type));
+
+        }
+
+
         //Build the relations
         var relation = null;
         for (i = 0; i < data.relations.length; i++) {
@@ -537,10 +572,14 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                               table_map[relation.to_table]));
         }
 
-        var diff_x;
-        var diff_y;
+        for (i = 0; i < data.tables.length; i++) {
+            $scope.tables[i].update_positions();
+        }
 
         // Calculate the new scale to show the entire diagram
+
+        var diff_x;
+        var diff_y;
         if (min_x !== null && min_y !== null && max_x !== null && max_y !== null) {
             console.log(['min_x', min_x]);
             console.log(['min_y', min_y]);

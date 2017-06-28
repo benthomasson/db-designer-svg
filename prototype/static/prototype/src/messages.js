@@ -55,6 +55,33 @@ function TableUnSelected(sender, id) {
 }
 exports.TableUnSelected = TableUnSelected;
 
+function ColumnCreate(sender, id, table_id, name, type) {
+    this.sender = sender;
+    this.id = id;
+    this.table_id = table_id;
+    this.name = name;
+    this.type = type;
+}
+exports.ColumnCreate = ColumnCreate;
+
+function ColumnDestroy(sender, id, table_id, previous_name, previous_type) {
+    this.sender = sender;
+    this.id = id;
+    this.table_id = table_id;
+    this.previous_name = previous_name;
+    this.previous_type = previous_type;
+}
+exports.ColumnDestroy = ColumnDestroy;
+
+function ColumnLabelEdit(sender, table_id, id, name, previous_name) {
+    this.sender = sender;
+    this.table_id = table_id;
+    this.id = id;
+    this.name = name;
+    this.previous_name = previous_name;
+}
+exports.ColumnLabelEdit = ColumnLabelEdit;
+
 function RelationCreate(sender, from_id, to_id) {
     this.sender = sender;
     this.from_id = from_id;

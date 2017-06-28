@@ -13,7 +13,8 @@
     "inherits": "",
     "require": "",
     "jshint": "",
-    "less": ""
+    "less": "",
+    "to-snake-case": ""
   },
   "devDependencies": {
     "eslint": "^3.17.1",
