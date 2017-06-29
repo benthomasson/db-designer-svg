@@ -475,6 +475,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.panX = data.panX;
         $scope.panY = data.panX;
         $scope.current_scale = data.scale;
+        $scope.table_id_seq = util.natural_numbers(data.table_id_seq);
         $location.search({database_id: data.database_id});
     };
 
@@ -547,6 +548,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                                            table.x,
                                            table.y,
                                            table.type);
+            new_table.column_id_seq = util.natural_numbers(data.tables[i].column_id_seq);
             $scope.tables.push(new_table);
             table_map[table.id] = new_table;
         }

@@ -40,7 +40,7 @@ Table.prototype.toJSON = function () {
 
 Table.prototype.update_positions = function () {
 
-    this.width = 14 * this.name.length + 10;
+    this.width = 10 * this.name.length + 10;
 
     var current_y = 0;
     var width = this.width;
@@ -52,6 +52,7 @@ Table.prototype.update_positions = function () {
     for (i = 0; i < this.columns.length; i++) {
         this.columns[i].y = current_y;
         current_y += this.columns[i].height;
+        this.columns[i].width = this.columns[i].name.length * 10 + 10;
         width = Math.max(width,  this.columns[i].width);
         full_height += this.columns[i].height;
     }

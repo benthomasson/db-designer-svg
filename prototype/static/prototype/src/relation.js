@@ -65,7 +65,7 @@ exports.Selecting = Selecting;
 
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
-    if ($event.key === 'l') {
+    if ($event.key === 'l' && $event.meta) {
         controller.state.onNewRelation(controller, $event);
     }
 
@@ -100,9 +100,9 @@ _Connecting.prototype.onMouseDown = function () {
 
 _Connecting.prototype.onMouseUp = function (controller) {
 
-    var selected_table = controller.scope.select_tables(false);
-    if (selected_table !== null) {
-        controller.scope.new_relation.to_table = selected_table;
+    var selection = controller.scope.select_items(false);
+    if (selection.selected_table !== null) {
+        controller.scope.new_relation.to_table = selection.selected_table;
         controller.scope.send_control_message(new messages.RelationCreate(controller.scope.client_id,
                                                                       controller.scope.new_relation.from_table.id,
                                                                       controller.scope.new_relation.to_table.id));
@@ -124,9 +124,9 @@ _Selecting.prototype.onMouseDown = function () {
 
 _Selecting.prototype.onMouseUp = function (controller) {
 
-    var selected_table = controller.scope.select_tables(false);
-    if (selected_table !== null) {
-        controller.scope.new_relation = new models.Relation(selected_table, null, true);
+    var selection = controller.scope.select_items(false);
+    if (selection.selected_table !== null) {
+        controller.scope.new_relation = new models.Relation(selection.selected_table, null, true);
         controller.scope.relations.push(controller.scope.new_relation);
         controller.changeState(Connecting);
     }

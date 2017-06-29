@@ -41,7 +41,7 @@ def ws_connect(message):
                    .filter(table__database_id=database_id).values('id',
                                                                   'name',
                                                                   'type',
-                                                                  'table__id'))
+                                                                  'table__id').order_by('id'))
     relations = [dict(from_column=x['from_column__id'],
                       to_column=x['to_column__id']) for x in list(Relation.objects
                                                                   .filter(Q(from_column__table__database_id=database_id) |
@@ -88,6 +88,9 @@ def console_printer(message):
 
 class _Persistence(object):
 
+    def get_handler(self, message_type):
+        return getattr(self, "on{0}".format(message_type), None)
+
     def handle(self, message):
         database_id = message.get('database')
         if database_id is None:
@@ -109,7 +112,7 @@ class _Persistence(object):
                         message_type_id=message_type_id,
                         message_id=data[1].get('message_id', 0),
                         message_data=message['text']).save()
-        handler = getattr(self, "on{0}".format(message_type), None)
+        handler = self.get_handler(message_type)
         if handler is not None:
             handler(message_value, database_id, client_id)
         else:
@@ -140,10 +143,13 @@ class _Persistence(object):
             del table['sender']
         if 'message_id' in table:
             del table['message_id']
+        if 'msg_type' in table:
+            del table['msg_type']
         d, _ = Table.objects.get_or_create(database_id=database_id, id=table['id'], defaults=table)
         d.x = table['x']
         d.y = table['y']
         d.save()
+        Database.objects.filter(database_id=database_id).update(table_id_seq=table['id'])
 
     def onTableDestroy(self, table, database_id, client_id):
         Table.objects.filter(database_id=database_id, id=table['id']).delete()
@@ -162,9 +168,13 @@ class _Persistence(object):
         t = Table.objects.get(database_id=database_id, id=column['table_id'])
         if 'table_id' in column:
             del column['table_id']
+        if 'msg_type' in column:
+            del column['msg_type']
         Column.objects.get_or_create(table=t,
                                      id=column['id'],
                                      defaults=column)
+        t.column_id_seq = column['id']
+        t.save()
 
     def onColumnLabelEdit(self, column, database_id, client_id):
         t = Table.objects.filter(database_id=database_id, id=column['table_id'])
@@ -200,6 +210,14 @@ class _Persistence(object):
 
     def onRedo(self, message_value, database_id, client_id):
         redo_persistence.handle(message_value['original_message'], database_id, client_id)
+
+    def onMultipleMessage(self, message_value, topology_id, client_id):
+        for message in message_value['messages']:
+            handler = self.get_handler(message['msg_type'])
+            if handler is not None:
+                handler(message, topology_id, client_id)
+            else:
+                print "Unsupported message ", message['msg_type']
 
 
 persistence = _Persistence()

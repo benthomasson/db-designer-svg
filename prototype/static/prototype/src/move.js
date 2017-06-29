@@ -100,22 +100,40 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
 
 	var scope = controller.scope;
     var table = null;
+    var new_column;
 
 	if ($event.key === 't') {
 		table = new models.Table(controller.scope.table_id_seq(),
                                  "New",
                                  scope.scaledX,
                                  scope.scaledY);
+
+        new_column = new models.Column(table,
+                                       table.column_id_seq(),
+                                       "", "");
+
+        table.columns.push(new_column);
+        table.update_positions();
 	}
 
     if (table !== null) {
         scope.tables.push(table);
-        scope.send_control_message(new messages.TableCreate(scope.client_id,
-                                                             table.id,
-                                                             table.x,
-                                                             table.y,
-                                                             table.name,
-                                                             table.type));
+        scope.send_control_message(new messages.MultipleMessage(scope.client_id,
+                                                                [new messages.TableCreate(scope.client_id,
+                                                                                          table.id,
+                                                                                          table.x,
+                                                                                          table.y,
+                                                                                          table.name,
+                                                                                          table.type),
+                                                                 new messages.ColumnCreate(scope.client_id,
+                                                                        new_column.id,
+                                                                        table.id,
+                                                                        new_column.name,
+                                                                        new_column.type)]));
+        scope.selected_tables = [table];
+        table.selected = true;
+        controller.changeState(Selected2);
+        return;
     }
 
 	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
@@ -128,6 +146,26 @@ _Start.prototype.start = function (controller) {
 };
 _Start.prototype.start.transitions = ['Ready'];
 
+_Selected2.prototype.start = function (controller) {
+
+    if (controller.scope.selected_tables.length === 1) {
+        var table = controller.scope.selected_tables[0];
+        if (table.columns.length > 0 && table.columns[table.columns.length-1].name !== "") {
+            var new_column = new models.Column(table,
+                                               table.column_id_seq(),
+                                               "", "");
+
+
+            table.columns.push(new_column);
+            table.update_positions();
+            controller.scope.send_control_message(new messages.ColumnCreate(controller.scope.client_id,
+                                                                            new_column.id,
+                                                                            table.id,
+                                                                            new_column.name,
+                                                                            new_column.type));
+        }
+    }
+};
 
 
 _Selected2.prototype.onMouseDown = function (controller, $event) {
@@ -261,7 +299,7 @@ _EditLabel.prototype.end = function (controller) {
     if (table.columns.length === 0) {
         var new_column = new models.Column(table,
                                            table.column_id_seq(),
-                                           snake(table.name) + "_id", 0, 0, "");
+                                           snake(table.name) + "_id", "");
 
         table.columns.push(new_column);
         controller.scope.send_control_message(new messages.ColumnCreate(controller.scope.client_id,
@@ -269,6 +307,14 @@ _EditLabel.prototype.end = function (controller) {
                                                                         table.id,
                                                                         new_column.name,
                                                                         new_column.type));
+    }
+    if (table.columns[0].name === "") {
+        table.columns[0].name = snake(table.name) + "_id";
+        controller.scope.send_control_message(new messages.ColumnLabelEdit(controller.scope.client_id,
+                                                                            table.id,
+                                                                            table.columns[0].id,
+                                                                            table.columns[0].name,
+                                                                            ""));
     }
     table.update_positions();
 };

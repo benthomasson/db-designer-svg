@@ -108,6 +108,17 @@ _Past.prototype.onMessage = function(controller, message) {
     }
 };
 
+
+_Past.prototype.onMultipleMessage = function(controller, msg_type, message) {
+        var i = 0;
+        console.log(['MultipleMessage', message]);
+        if (message.sender !== controller.scope.client_id) {
+            for (i=0; i< message.messages.length; i++) {
+                controller.handle_message(message.messages[i].msg_type, message.messages[i]);
+            }
+        }
+};
+
 _Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
     if ($event.originalEvent.metaKey) {
@@ -257,6 +268,17 @@ _Present.prototype.onMessage = function(controller, message) {
     }
 };
 _Present.prototype.onMessage.transitions = ['Past'];
+
+_Present.prototype.onMultipleMessage = function(controller, msg_type, message) {
+
+    var i = 0;
+    console.log(['MultipleMessage', message]);
+    if (message.sender !== controller.scope.client_id) {
+        for (i = 0; i< message.messages.length; i++) {
+            controller.handle_message(message.messages[i].msg_type, message.messages[i]);
+        }
+    }
+};
 
 _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
