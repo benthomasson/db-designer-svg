@@ -1,0 +1,5 @@
+<ul>
+    {%for db in dbs%}
+    <li><a href="/static/prototype/index.html#!?database_id={{db.pk}}">{{db.pk}} {{db.name}}</a></li>
+    {%endfor%}
+</ul>

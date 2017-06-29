@@ -274,8 +274,22 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     // Buttons
 
-    $scope.buttons = [];
+    $scope.onDownloadButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/download?database_id=" + $scope.database_id);
+    };
 
+    $scope.onUploadButton = function (button) {
+        console.log(button.label);
+        window.open("/prototype/upload", "_top");
+    };
+
+    // Buttons
+
+    $scope.buttons = [
+      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton),
+      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton)
+    ];
 
 
     $scope.onTableCreate = function(data) {
@@ -683,6 +697,14 @@ app.directive('quadrants', function() {
 
 app.directive('button', function() {
   return { restrict: 'A', templateUrl: 'widgets/button.html' };
+});
+
+app.directive('download', function() {
+      return { restrict: 'A', templateUrl: 'widgets/download.svg' };
+});
+
+app.directive('upload', function() {
+      return { restrict: 'A', templateUrl: 'widgets/upload.svg' };
 });
 
 

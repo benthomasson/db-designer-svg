@@ -41,15 +41,8 @@
             <g quadrants>
             </g>
         </g>
-        <g ng-show="!hide_buttons">
-            <g> <!-- buttons -->
-                <g ng-repeat="button in buttons"
-                   ng-attr-transform="translate({{button.x}},{{button.y}})"
-                   ng-attr-class="{{button.is_pressed ? 'button-pressed' : button.mouse_over ? 'button-hover' : 'button'}}">
-                    <g button></g>
-                </g>
-            </g> <!-- end buttons -->
-        </g>
+        <g transform="translate(10, 10) scale(0.025)" download></g>
+        <g transform="translate(70, 7) scale(0.025)" upload></g>
         <g debug></g>
         <g cursor></g>
     </svg>
