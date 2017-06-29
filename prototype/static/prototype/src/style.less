@@ -60,8 +60,8 @@ svg rect.debug {
 }
 
 svg line.relation {
-    stroke: @relation;
-    stroke-width: 2;
+    stroke: @dark-widget-detail;
+    stroke-width: 1;
 }
 
 svg line.cursor {
@@ -132,4 +132,15 @@ svg line.debug {
     fill: @light-widget-detail;
     stroke-width: 1;
     stroke: @dark-widget-detail;
+}
+
+
+svg path.arrow {
+    stroke: @dark-widget-detail;
+    fill: @dark-widget-detail;
+}
+
+path.arrow-selected {
+    fill: @selected-blue;
+    stroke: @selected-blue;
 }

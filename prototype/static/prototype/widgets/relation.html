@@ -1,10 +1,22 @@
-                <line ng-attr-x1="{{relation.from_table.x}}"
-                      ng-attr-y1="{{relation.from_table.y}}"
-                      ng-attr-x2="{{relation.to_table !== null ? relation.to_table.x : scaledX}}"
-                      ng-attr-y2="{{relation.to_table !== null ? relation.to_table.y : scaledY}}"
-                      ng-attr-class="{{relation.selected && 'selected' || 'hidden'}}"/>
-                <line ng-attr-x1="{{relation.from_table.x}}"
-                      ng-attr-y1="{{relation.from_table.y}}"
-                      ng-attr-x2="{{relation.to_table !== null ? relation.to_table.x : scaledX}}"
-                      ng-attr-y2="{{relation.to_table !== null ? relation.to_table.y : scaledY}}"
-                      class="relation {{relation.status === null ? 'unknown' : relation.status ? 'pass' : 'fail'}}"/>
+<line ng-attr-x1="{{relation.from_column.relation_x(relation.to_column)}}"
+	  ng-attr-y1="{{relation.from_column.mid_y()}}"
+	  ng-attr-x2="{{relation.to_column !== null ? relation.to_column.relation_x(relation.from_column) : scaledX}}"
+	  ng-attr-y2="{{relation.to_column !== null ? relation.to_column.mid_y() : scaledY}}"
+	  ng-attr-class="{{relation.selected && 'selected' || 'hidden'}}"/>
+<line ng-attr-x1="{{relation.from_column.relation_x(relation.to_column)}}"
+	  ng-attr-y1="{{relation.from_column.mid_y()}}"
+	  ng-attr-x2="{{relation.to_column !== null ? relation.to_column.relation_x(relation.from_column) : scaledX}}"
+	  ng-attr-y2="{{relation.to_column !== null ? relation.to_column.mid_y() : scaledY}}"
+	  class="relation"/>
+<!-- Arrow -->
+<g ng-if="relation.to_column !== relation.from_column">
+<g ng-if="relation.to_column !== null"  ng-attr-transform="translate({{relation.to_column.relation_x(relation.from_column)}},
+                                                                      {{relation.to_column.mid_y()}})
+                      rotate({{relation.slope()}})
+                      rotate(180)">
+<g transform="translate(-19, -9)">
+<path ng-attr-transform="translate(-2, -3)" d="M0,0 L0,24 L24,12 z" class="arrow-selected {{relation.selected && 'selected' || 'hidden'}}"/>
+<path d="M0,0 L0,18 L18,9 z" class="arrow"/>
+</g>
+</g>
+<!-- End Arrow -->

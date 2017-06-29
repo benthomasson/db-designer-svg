@@ -83,6 +83,20 @@ inherits(_EditColumnLabel, _State);
 var EditColumnLabel = new _EditColumnLabel();
 exports.EditColumnLabel = EditColumnLabel;
 
+function _Connecting () {
+    this.name = 'Connecting';
+}
+inherits(_Connecting, _State);
+var Connecting = new _Connecting();
+exports.Connecting = Connecting;
+
+function _Connected () {
+    this.name = 'Connected';
+}
+inherits(_Connected, _State);
+var Connected = new _Connected();
+exports.Connected = Connected;
+
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
     var selection = controller.scope.select_items($event.shiftKey);
@@ -225,7 +239,14 @@ _Selected2.prototype.onMouseUp.transitions = ['Ready'];
 
 _Selected1.prototype.onMouseMove = function (controller) {
 
-    controller.changeState(Move);
+    var selection = controller.scope.select_items(true);
+    if (selection.last_selected_column !== null) {
+        controller.scope.new_relation = new models.Relation(selection.last_selected_column, null);
+        controller.scope.relations.push(controller.scope.new_relation);
+        controller.changeState(Connecting);
+    } else {
+        controller.changeState(Move);
+    }
 
 };
 _Selected1.prototype.onMouseMove.transitions = ['Move'];
@@ -391,3 +412,34 @@ _EditColumnLabel.prototype.onKeyDown = function (controller, $event) {
     column.table.update_positions();
 };
 _EditColumnLabel.prototype.onKeyDown.transitions = ['Selected2'];
+
+_Connecting.prototype.onMouseDown = function () {
+};
+
+_Connecting.prototype.onMouseUp = function (controller) {
+
+    var selection = controller.scope.select_items(false);
+    if (selection.last_selected_column !== null) {
+        controller.scope.new_relation.to_column = selection.last_selected_column;
+        controller.scope.send_control_message(new messages.RelationCreate(controller.scope.client_id,
+                                                                          controller.scope.new_relation.from_column.table.id,
+                                                                          controller.scope.new_relation.from_column.id,
+                                                                          controller.scope.new_relation.to_column.table.id,
+                                                                          controller.scope.new_relation.to_column.id));
+        controller.scope.new_relation = null;
+        controller.changeState(Connected);
+    } else {
+        var index = controller.scope.relations.indexOf(controller.scope.new_relation);
+        if (index !== -1) {
+            controller.scope.relations.splice(index, 1);
+        }
+        controller.scope.new_relation = null;
+        controller.changeState(Ready);
+    }
+};
+
+_Connected.prototype.start = function (controller) {
+
+    controller.scope.clear_selections();
+    controller.changeState(Ready);
+};

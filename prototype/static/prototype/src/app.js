@@ -4,7 +4,6 @@ var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
 var view = require('./view.js');
 var move = require('./move.js');
-var relation = require('./relation.js');
 var buttons = require('./buttons.js');
 var time = require('./time.js');
 var util = require('./util.js');
@@ -45,8 +44,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
   $scope.new_relation = null;
   $scope.view_controller = new fsm.FSMController($scope, view.Start, null);
   $scope.move_controller = new fsm.FSMController($scope, move.Start, $scope.view_controller);
-  $scope.relation_controller = new fsm.FSMController($scope, relation.Start, $scope.move_controller);
-  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.relation_controller);
+  $scope.buttons_controller = new fsm.FSMController($scope, buttons.Start, $scope.move_controller);
   $scope.time_controller = new fsm.FSMController($scope, time.Start, $scope.buttons_controller);
   $scope.first_controller = $scope.time_controller;
   $scope.last_key = "";
@@ -570,8 +568,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var relation = null;
         for (i = 0; i < data.relations.length; i++) {
             relation = data.relations[i];
-            $scope.relations.push(new models.Relation(table_map[relation.from_table],
-                                              table_map[relation.to_table]));
+            $scope.relations.push(new models.Relation(table_map[relation.from_table].get_column(relation.from_column),
+                                              table_map[relation.to_table].get_column(relation.to_column)));
         }
 
         for (i = 0; i < data.tables.length; i++) {

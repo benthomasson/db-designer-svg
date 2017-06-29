@@ -91,11 +91,13 @@ function ColumnLabelEdit(sender, table_id, id, name, previous_name) {
 }
 exports.ColumnLabelEdit = ColumnLabelEdit;
 
-function RelationCreate(sender, from_id, to_id) {
+function RelationCreate(sender, from_table_id, from_column_id, to_table_id, to_column_id) {
     this.msg_type = "RelationCreate";
     this.sender = sender;
-    this.from_id = from_id;
-    this.to_id = to_id;
+    this.from_table_id = from_table_id;
+    this.from_column_id = from_column_id;
+    this.to_table_id = to_table_id;
+    this.to_column_id = to_column_id;
 }
 exports.RelationCreate = RelationCreate;
 

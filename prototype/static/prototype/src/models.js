@@ -18,6 +18,17 @@ function Table(id, name, x, y) {
 }
 exports.Table = Table;
 
+Table.prototype.get_column = function(id) {
+    var i = 0;
+    for (i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].id === id) {
+            return this.columns[i];
+        }
+    }
+
+    return null;
+};
+
 Table.prototype.is_selected = function (x, y) {
 
     return (x > this.x &&
@@ -76,6 +87,31 @@ function Column(table, id, name, type) {
 }
 exports.Column = Column;
 
+Column.prototype.abs_x = function () {
+    return this.table.x;
+};
+
+Column.prototype.abs_y = function () {
+    return this.table.y + this.y;
+};
+
+Column.prototype.mid_y = function () {
+    return this.table.y + this.y + this.height / 2;
+};
+
+Column.prototype.relation_x = function (other_column) {
+    if (other_column === null) {
+        return this.table.x + this.table.width/2;
+    }
+    if (other_column.abs_x() + other_column.table.width < this.abs_x()) {
+        return this.table.x;
+    }
+    if (other_column.abs_x() + other_column.table.width > this.abs_x() + this.table.width) {
+        return this.table.x + this.table.width;
+    }
+    return this.table.x + this.table.width/2;
+};
+
 Column.prototype.is_selected = function (x, y) {
 
     return (x > this.table.x &&
@@ -97,6 +133,17 @@ Relation.prototype.toJSON = function () {
     return {to_column: this.to_column.id,
             from_column: this.from_column.id};
 };
+
+
+Relation.prototype.slope = function () {
+    //Return the slope in degrees for this transition.
+    var x1 = this.from_column.relation_x(this.to_column);
+    var y1 = this.from_column.mid_y();
+    var x2 = this.to_column.relation_x(this.from_column);
+    var y2 = this.to_column.mid_y();
+    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 180;
+};
+
 
 function Button(name, x, y, width, height, callback) {
     this.name = name;
