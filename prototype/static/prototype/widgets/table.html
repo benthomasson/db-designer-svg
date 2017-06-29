@@ -15,11 +15,11 @@
 <g ng-show="current_scale > 0.5">
 <text ng-attr-class="{{table.selected && ! table.edit_label ? 'table-text--selected' : 'hidden'}}"
       filter="url(#selected)"
-      text-anchor="middle"
+      text-anchor="left"
       ng-attr-x="{{table.width/2}}"
       ng-attr-y="{{table.height/2}}"
       dy=".2em"> {{table.name}} </text>
-<text class="table-text" text-anchor="middle" dy=".2em" ng-attr-x="{{table.width/2}}" ng-attr-y="{{table.height/2}}">{{table.name}}{{table.edit_label?'_':''}}</text>
+<text class="table-text" text-anchor="left" dy=".2em" ng-attr-x="{{10}}" ng-attr-y="{{table.height/2}}">{{table.name}}{{table.edit_label?'_':''}}</text>
 </g>
 <g ng-repeat="column in table.columns">
     <rect ng-attr-x="{{column.x}}"
@@ -29,6 +29,6 @@
           class="table-column">
     </rect>
 <g ng-show="current_scale > 0.5">
-    <text class="table-text" text-anchor="middle" dy=".2em" ng-attr-x="{{table.width/2}}" ng-attr-y="{{column.y + column.height/2}}">{{column.name}}{{column.edit_label?'_':''}}</text>
+    <text class="table-text" text-anchor="left" dy=".2em" ng-attr-x="{{10}}" ng-attr-y="{{column.y + column.height/2}}">{{column.name}}{{column.edit_label?'_':''}}</text>
 </g>
 </g>

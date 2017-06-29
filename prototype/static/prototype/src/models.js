@@ -1,6 +1,8 @@
 var fsm = require('./fsm.js');
 var button = require('./button.js');
 var util = require('./util.js');
+var text_width = require('text-width');
+
 
 function Table(id, name, x, y) {
     this.id = id;
@@ -51,7 +53,7 @@ Table.prototype.toJSON = function () {
 
 Table.prototype.update_positions = function () {
 
-    this.width = 10 * this.name.length + 10;
+    this.width = text_width(this.name, {size: 14}) + 10;
 
     var current_y = 0;
     var width = this.width;
@@ -63,8 +65,8 @@ Table.prototype.update_positions = function () {
     for (i = 0; i < this.columns.length; i++) {
         this.columns[i].y = current_y;
         current_y += this.columns[i].height;
-        this.columns[i].width = this.columns[i].name.length * 10 + 10;
-        width = Math.max(width,  this.columns[i].width);
+        this.columns[i].width = text_width(this.columns[i].name, {size: 14}) + 10;
+        width = Math.max(width, this.columns[i].width);
         full_height += this.columns[i].height;
     }
 
