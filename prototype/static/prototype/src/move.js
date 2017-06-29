@@ -249,7 +249,7 @@ _Selected1.prototype.onMouseMove = function (controller) {
     }
 
 };
-_Selected1.prototype.onMouseMove.transitions = ['Move'];
+_Selected1.prototype.onMouseMove.transitions = ['Move', 'Connecting'];
 
 _Selected1.prototype.onMouseUp = function (controller) {
 
@@ -305,9 +305,17 @@ _Selected3.prototype.onMouseUp.transitions = ['EditLabel', 'EditColumnLabel'];
 
 
 _Selected3.prototype.onMouseMove = function (controller) {
-    controller.changeState(Move);
+
+    var selection = controller.scope.select_items(true);
+    if (selection.last_selected_column !== null) {
+        controller.scope.new_relation = new models.Relation(selection.last_selected_column, null);
+        controller.scope.relations.push(controller.scope.new_relation);
+        controller.changeState(Connecting);
+    } else {
+        controller.changeState(Move);
+    }
 };
-_Selected3.prototype.onMouseMove.transitions = ['Move'];
+_Selected3.prototype.onMouseMove.transitions = ['Move', 'Connecting'];
 
 
 _EditLabel.prototype.start = function (controller) {
@@ -320,7 +328,7 @@ _EditLabel.prototype.end = function (controller) {
     if (table.columns.length === 0) {
         var new_column = new models.Column(table,
                                            table.column_id_seq(),
-                                           snake(table.name) + "_id", "");
+                                           snake(table.name) + "_id:AutoField", "");
 
         table.columns.push(new_column);
         controller.scope.send_control_message(new messages.ColumnCreate(controller.scope.client_id,
@@ -330,7 +338,7 @@ _EditLabel.prototype.end = function (controller) {
                                                                         new_column.type));
     }
     if (table.columns[0].name === "") {
-        table.columns[0].name = snake(table.name) + "_id";
+        table.columns[0].name = snake(table.name) + "_id:AutoField";
         controller.scope.send_control_message(new messages.ColumnLabelEdit(controller.scope.client_id,
                                                                             table.id,
                                                                             table.columns[0].id,
@@ -426,6 +434,14 @@ _Connecting.prototype.onMouseUp = function (controller) {
                                                                           controller.scope.new_relation.from_column.id,
                                                                           controller.scope.new_relation.to_column.table.id,
                                                                           controller.scope.new_relation.to_column.id));
+        if (controller.scope.new_relation.from_column.name === "") {
+            controller.scope.new_relation.from_column.name = snake(controller.scope.new_relation.to_column.table.name) + ":ForeignKey";
+            controller.scope.send_control_message(new messages.ColumnLabelEdit(controller.scope.client_id,
+                                                                                controller.scope.new_relation.from_column.table.id,
+                                                                                controller.scope.new_relation.from_column.id,
+                                                                                controller.scope.new_relation.from_column.name,
+                                                                                ""));
+        }
         controller.scope.new_relation = null;
         controller.changeState(Connected);
     } else {
