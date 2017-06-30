@@ -183,6 +183,12 @@ class _Persistence(object):
         t.column_id_seq = column['id']
         t.save()
 
+
+    def onColumnDestroy(self, column, database_id, client_id):
+        t = Table.objects.get(database_id=database_id, id=column['table_id'])
+        Column.objects.filter(table=t,
+                              id=column['id']).delete()
+
     def onColumnLabelEdit(self, column, database_id, client_id):
         t = Table.objects.filter(database_id=database_id, id=column['table_id'])
         Column.objects.filter(table=t, id=column['id']).update(name=column['name'])

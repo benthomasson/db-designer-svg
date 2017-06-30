@@ -97,6 +97,45 @@ inherits(_Connected, _State);
 var Connected = new _Connected();
 exports.Connected = Connected;
 
+_Ready.prototype.start = function (controller) {
+
+    if (controller.scope.tables === undefined) {
+        return;
+    }
+
+    var i = 0;
+    var j = 0;
+    var table = null;
+    var column = null;
+    var index = null;
+    var found = false;
+
+    for (i = 0; i < controller.scope.tables.length; i++) {
+        table = controller.scope.tables[i];
+        found = false;
+        for (j = 0; j < table.columns.length; j++) {
+            column = table.columns[j];
+            if (column.name === "") {
+                index = table.columns.indexOf(column);
+                if (index !== -1) {
+                    table.columns.splice(index, 1);
+                    found = true;
+                    j--;
+                    controller.scope.send_control_message(new messages.ColumnDestroy(controller.scope.client_id,
+                                                                                     column.id,
+                                                                                     table.id,
+                                                                                     column.name,
+                                                                                     column.type));
+                }
+            }
+        }
+        if (found) {
+            table.update_positions();
+        }
+    }
+
+};
+
 _Ready.prototype.onMouseDown = function (controller, $event) {
 
     var selection = controller.scope.select_items($event.shiftKey);
@@ -180,6 +219,7 @@ _Selected2.prototype.start = function (controller) {
         }
     }
 };
+
 
 
 _Selected2.prototype.onMouseDown = function (controller, $event) {
