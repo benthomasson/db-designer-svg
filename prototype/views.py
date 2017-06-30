@@ -134,6 +134,7 @@ def upload_db(data):
     columns = []
     relations = []
     column_count = defaultdict(lambda: 0)
+    relation_i = 0
     for i, table in enumerate(data.get('models', [])):
         new_table = Table(database_id=db.pk,
                           name=table.get('name'),
@@ -172,15 +173,18 @@ def upload_db(data):
     for table in data.get('models', []):
         for i, column in enumerate(table.get('fields', [])):
             if column.get('ref') and column.get('ref_field'):
-                new_relation = Relation(from_column_id=columns_map[(table['name'], column['name'])],
+                new_relation = Relation(id=relation_i,
+                                        from_column_id=columns_map[(table['name'], column['name'])],
                                         to_column_id=columns_map[(column.get('ref'), column.get('ref_field'))])
                 relations.append(new_relation)
+                relation_i += 1
 
     Relation.objects.bulk_create(relations)
     for table in Table.objects.filter(database_id=db.pk):
         table.column_id_seq = column_count[table.name]
         table.save()
     db.table_id_seq = len(tables)
+    db.relation_id_seq = len(relations)
     db.save()
     return db.pk
 

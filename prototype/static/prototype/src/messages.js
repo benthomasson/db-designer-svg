@@ -91,9 +91,10 @@ function ColumnLabelEdit(sender, table_id, id, name, previous_name) {
 }
 exports.ColumnLabelEdit = ColumnLabelEdit;
 
-function RelationCreate(sender, from_table_id, from_column_id, to_table_id, to_column_id) {
+function RelationCreate(sender, id, from_table_id, from_column_id, to_table_id, to_column_id) {
     this.msg_type = "RelationCreate";
     this.sender = sender;
+    this.id = id;
     this.from_table_id = from_table_id;
     this.from_column_id = from_column_id;
     this.to_table_id = to_table_id;
@@ -101,13 +102,30 @@ function RelationCreate(sender, from_table_id, from_column_id, to_table_id, to_c
 }
 exports.RelationCreate = RelationCreate;
 
-function RelationDestroy(sender, from_id, to_id) {
+function RelationDestroy(sender, id, from_table_id, from_column_id, to_table_id, to_column_id) {
     this.msg_type = "RelationDestroy";
     this.sender = sender;
-    this.from_id = from_id;
-    this.to_id = to_id;
+    this.id = id;
+    this.from_table_id = from_table_id;
+    this.from_column_id = from_column_id;
+    this.to_table_id = to_table_id;
+    this.to_column_id = to_column_id;
 }
 exports.RelationDestroy = RelationDestroy;
+
+function RelationSelected(sender, id) {
+    this.msg_type = "RelationSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.RelationSelected = RelationSelected;
+
+function RelationUnSelected(sender, id) {
+    this.msg_type = "RelationUnSelected";
+    this.sender = sender;
+    this.id = id;
+}
+exports.RelationUnSelected = RelationUnSelected;
 
 function Undo(sender, original_message) {
     this.msg_type = "Undo";

@@ -122,8 +122,8 @@ Column.prototype.is_selected = function (x, y) {
             y < this.table.y + this.y + this.height);
 };
 
-
-function Relation(from_column, to_column) {
+function Relation(id, from_column, to_column) {
+	this.id = id;
     this.from_column = from_column;
     this.to_column = to_column;
     this.selected = false;
@@ -146,6 +146,22 @@ Relation.prototype.slope = function () {
     return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 180;
 };
 
+Relation.prototype.is_selected = function (x, y) {
+    if (this.to_column === null) {
+        return false;
+    }
+    var x1 = this.from_column.relation_x(this.to_column);
+    var y1 = this.from_column.mid_y();
+    var x2 = this.to_column.relation_x(this.from_column);
+    var y2 = this.to_column.mid_y();
+    var d = util.pDistance(x, y, x1, y1, x2, y2);
+    if (util.cross_z_pos(x, y, x1, y1, x2, y2)) {
+        return d < 10;
+    } else {
+        return d < 10;
+    }
+    return false;
+};
 
 function Button(name, x, y, width, height, callback) {
     this.name = name;

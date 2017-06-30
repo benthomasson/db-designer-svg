@@ -126,7 +126,7 @@ _Selecting.prototype.onMouseUp = function (controller) {
 
     var selection = controller.scope.select_items(false);
     if (selection.selected_table !== null) {
-        controller.scope.new_relation = new models.Relation(selection.selected_table, null, true);
+        controller.scope.new_relation = new models.Relation(controller.scope.relation_id_seq(), selection.selected_table, null, true);
         controller.scope.relations.push(controller.scope.new_relation);
         controller.changeState(Connecting);
     }

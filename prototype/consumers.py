@@ -45,13 +45,15 @@ def ws_connect(message):
     relations = [dict(from_column=x['from_column__id'],
                       to_column=x['to_column__id'],
                       from_table=x['from_column__table__id'],
-                      to_table=x['to_column__table__id']) for x in list(Relation.objects
-                                                                  .filter(Q(from_column__table__database_id=database_id) |
-                                                                          Q(to_column__table__database_id=database_id))
-                                                                  .values('from_column__id',
-                                                                          'to_column__id',
-                                                                          'from_column__table__id',
-                                                                          'to_column__table__id'))]
+                      to_table=x['to_column__table__id'],
+                      id=x['id']) for x in list(Relation.objects
+                                                        .filter(Q(from_column__table__database_id=database_id) |
+                                                                Q(to_column__table__database_id=database_id))
+                                                        .values('id',
+                                                                'from_column__id',
+                                                                'to_column__id',
+                                                                'from_column__table__id',
+                                                                'to_column__table__id'))]
     snapshot = dict(sender=0,
                     tables=tables,
                     columns=columns,
@@ -195,14 +197,19 @@ class _Persistence(object):
                          .values_list('id', 'pk'))
         from_column = Column.objects.get(table_id=table_map[relation['from_table_id']], id=relation['from_column_id'])
         to_column = Column.objects.get(table_id=table_map[relation['to_table_id']], id=relation['to_column_id'])
-        Relation.objects.get_or_create(from_column=from_column, to_column=to_column)
+        Relation.objects.get_or_create(id=relation['id'], from_column=from_column, to_column=to_column)
 
     def onRelationDestroy(self, relation, database_id, client_id):
+        print relation
         table_map = dict(Table.objects
-                         .filter(database_id=database_id, id__in=[relation['from_id'], relation['to_id']])
+                         .filter(database_id=database_id, id__in=[relation['from_table_id'], relation['to_table_id']])
                          .values_list('id', 'pk'))
-        Relation.objects.filter(from_column_id=table_map[relation['from_id']],
-                                to_column_id=table_map[relation['to_id']]).delete()
+        print table_map
+        from_column = Column.objects.get(table_id=table_map[relation['from_table_id']], id=relation['from_column_id'])
+        to_column = Column.objects.get(table_id=table_map[relation['to_table_id']], id=relation['to_column_id'])
+        print from_column, to_column
+        print Relation.objects.filter(id=relation['id'], from_column=from_column, to_column=to_column).count()
+        Relation.objects.filter(id=relation['id'], from_column=from_column, to_column=to_column).delete()
 
     def onTableSelected(self, message_value, database_id, client_id):
         'Ignore TableSelected messages'

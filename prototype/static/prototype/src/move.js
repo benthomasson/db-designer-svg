@@ -101,7 +101,7 @@ _Ready.prototype.onMouseDown = function (controller, $event) {
 
     var selection = controller.scope.select_items($event.shiftKey);
 
-    if (selection.last_selected_table !== null) {
+    if (selection.last_selected_table !== null || selection.last_selected_relation !== null) {
         controller.changeState(Selected1);
     } else {
         controller.next_controller.state.onMouseDown(controller.next_controller, $event);
@@ -208,9 +208,24 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         var j = 0;
         var index = -1;
         var tables = controller.scope.selected_tables;
+        var relations = controller.scope.selected_relations;
         var all_relations = controller.scope.relations.slice();
         controller.scope.selected_tables = [];
         controller.scope.selected_relations = [];
+        for (i = 0; i < relations.length; i++) {
+            index = controller.scope.relations.indexOf(relations[i]);
+            if (index !== -1) {
+                relations[i].selected = false;
+                relations[i].remote_selected = false;
+                controller.scope.relations.splice(index, 1);
+                controller.scope.send_control_message(new messages.RelationDestroy(controller.scope.client_id,
+                                                                               relations[i].id,
+                                                                               relations[i].from_column.table.id,
+                                                                               relations[i].from_column.id,
+                                                                               relations[i].to_column.table.id,
+                                                                               relations[i].to_column.id));
+            }
+        }
         for (i = 0; i < tables.length; i++) {
             index = controller.scope.tables.indexOf(tables[i]);
             if (index !== -1) {
@@ -241,7 +256,7 @@ _Selected1.prototype.onMouseMove = function (controller) {
 
     var selection = controller.scope.select_items(true);
     if (selection.last_selected_column !== null) {
-        controller.scope.new_relation = new models.Relation(selection.last_selected_column, null);
+        controller.scope.new_relation = new models.Relation(controller.scope.relation_id_seq(), selection.last_selected_column, null);
         controller.scope.relations.push(controller.scope.new_relation);
         controller.changeState(Connecting);
     } else {
@@ -308,7 +323,7 @@ _Selected3.prototype.onMouseMove = function (controller) {
 
     var selection = controller.scope.select_items(true);
     if (selection.last_selected_column !== null) {
-        controller.scope.new_relation = new models.Relation(selection.last_selected_column, null);
+        controller.scope.new_relation = new models.Relation(controller.scope.relation_id_seq(), selection.last_selected_column, null);
         controller.scope.relations.push(controller.scope.new_relation);
         controller.changeState(Connecting);
     } else {
@@ -430,6 +445,7 @@ _Connecting.prototype.onMouseUp = function (controller) {
     if (selection.last_selected_column !== null) {
         controller.scope.new_relation.to_column = selection.last_selected_column;
         controller.scope.send_control_message(new messages.RelationCreate(controller.scope.client_id,
+                                                                          controller.scope.new_relation.id,
                                                                           controller.scope.new_relation.from_column.table.id,
                                                                           controller.scope.new_relation.from_column.id,
                                                                           controller.scope.new_relation.to_column.table.id,

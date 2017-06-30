@@ -58,6 +58,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                   'right_column': window.innerWidth - 300,
                   'height': window.innerHeight};
   $scope.table_id_seq = util.natural_numbers(0);
+  $scope.relation_id_seq = util.natural_numbers(0);
   $scope.message_id_seq = util.natural_numbers(0);
   $scope.time_pointer = -1;
   $scope.frame = 0;
@@ -142,6 +143,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var tables = $scope.tables;
         var last_selected_table = null;
         var last_selected_column = null;
+        var last_selected_relation = null;
 
         $scope.pressedX = $scope.mouseX;
         $scope.pressedY = $scope.mouseY;
@@ -182,7 +184,26 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
                 }
             }
         }
+
+		// Do not select relations if a table was selected
+        if (last_selected_table === null) {
+            for (i = $scope.relations.length - 1; i >= 0; i--) {
+                if($scope.relations[i].is_selected($scope.scaledX, $scope.scaledY)) {
+                    $scope.relations[i].selected = true;
+                    $scope.send_control_message(new messages.RelationSelected($scope.client_id, $scope.relations[i].id));
+                    last_selected_relation = $scope.relations[i];
+                    if ($scope.selected_relations.indexOf($scope.relations[i]) === -1) {
+                        $scope.selected_relations.push($scope.relations[i]);
+                        if (!multiple_selection) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         return {last_selected_table: last_selected_table,
+                last_selected_relation: last_selected_relation,
                 last_selected_column: last_selected_column};
     };
 
@@ -326,7 +347,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.create_relation = function(data) {
         var i = 0;
-        var new_relation = new models.Relation(null, null);
+        var new_relation = new models.Relation($scope.relation_id_seq(), null, null);
         for (i = 0; i < $scope.tables.length; i++){
             if ($scope.tables[i].id === data.from_id) {
                 new_relation.from_table = $scope.tables[i];
@@ -488,6 +509,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.panY = data.panX;
         $scope.current_scale = data.scale;
         $scope.table_id_seq = util.natural_numbers(data.table_id_seq);
+        $scope.relation_id_seq = util.natural_numbers(data.relation_id_seq);
         $location.search({database_id: data.database_id});
     };
 
@@ -532,6 +554,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var table = null;
         var new_table = null;
         var max_table_id = null;
+        var max_relation_id = null;
         var min_x = null;
         var min_y = null;
         var max_x = null;
@@ -582,7 +605,10 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         var relation = null;
         for (i = 0; i < data.relations.length; i++) {
             relation = data.relations[i];
-            $scope.relations.push(new models.Relation(table_map[relation.from_table].get_column(relation.from_column),
+            if (max_relation_id === null || relation.id > max_relation_id) {
+                max_relation_id = relation.id;
+            }
+            $scope.relations.push(new models.Relation(relation.id, table_map[relation.from_table].get_column(relation.from_column),
                                               table_map[relation.to_table].get_column(relation.to_column)));
         }
 
