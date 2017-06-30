@@ -24,7 +24,7 @@ admin.site.register(Table, TableAdmin)
 
 
 class DatabaseAdmin(admin.ModelAdmin):
-    fields = ('name', 'scale', 'panX', 'panY', 'table_id_seq',)
+    fields = ('name', 'scale', 'panX', 'panY', 'table_id_seq', 'relation_id_seq',)
     raw_id_fields = ()
 
 
@@ -64,7 +64,7 @@ admin.site.register(Column, ColumnAdmin)
 
 
 class RelationAdmin(admin.ModelAdmin):
-    fields = ('from_column', 'to_column',)
+    fields = ('from_column', 'to_column', 'id',)
     raw_id_fields = ('from_column', 'to_column',)
 
 

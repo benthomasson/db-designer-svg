@@ -23,6 +23,7 @@ class Database(models.Model):
     panX = models.FloatField()
     panY = models.FloatField()
     table_id_seq = models.IntegerField(default=0)
+    relation_id_seq = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -72,3 +73,4 @@ class Relation(models.Model):
     relation_id = models.AutoField(primary_key=True,)
     from_column = models.ForeignKey('Column',  related_name='+', )
     to_column = models.ForeignKey('Column',  related_name='+', )
+    id = models.IntegerField()

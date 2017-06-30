@@ -42,6 +42,9 @@ models:
   - default: 0
     name: table_id_seq
     type: IntegerField
+  - default: 0
+    name: relation_id_seq
+    type: IntegerField
   name: Database
   x: 111
   y: 127
@@ -136,6 +139,8 @@ models:
     ref_field: column_id
     related_name: +
     type: ForeignKey
+  - name: id
+    type: IntegerField
   name: Relation
   x: 880
   y: 132
