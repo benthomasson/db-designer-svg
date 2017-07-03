@@ -31,7 +31,7 @@ transitions:
   label: onMouseWheel
   to_state: Scale
 - from_state: Scale
-  label: onTimeout
+  label: onMouseWheel
   to_state: Ready
 - from_state: Ready
   label: onMouseDown

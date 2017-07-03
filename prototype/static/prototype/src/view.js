@@ -65,12 +65,14 @@ _Ready.prototype.onMouseDown = function (controller) {
     controller.changeState(Pressed);
 
 };
+_Ready.prototype.onMouseDown.transitions = ['Pressed'];
 
 _Ready.prototype.onMouseWheel = function (controller, event, delta, deltaX, deltaY) {
 
     controller.changeState(Scale);
     controller.state.onMouseWheel(controller, event, delta, deltaX, deltaY);
 };
+_Ready.prototype.onMouseWheel.transitions = ['Scale'];
 
 _Ready.prototype.onKeyDown = function(controller, $event) {
 
@@ -96,14 +98,8 @@ _Start.prototype.start = function (controller) {
     controller.changeState(Ready);
 
 };
+_Start.prototype.start.transitions = ['Ready'];
 
-
-
-_Scale.prototype.timeout = function (controller) {
-
-    controller.changeState(Ready);
-
-};
 
 
 _Scale.prototype.onMouseWheel = function (controller, event, delta) {
@@ -117,6 +113,7 @@ _Scale.prototype.onMouseWheel = function (controller, event, delta) {
       controller.scope.updatePanAndScale();
       controller.changeState(Ready);
 };
+_Scale.prototype.onMouseWheel.transitions = ['Ready'];
 
 
 _Pressed.prototype.onMouseUp = function (controller) {
@@ -124,12 +121,14 @@ _Pressed.prototype.onMouseUp = function (controller) {
     controller.changeState(Ready);
 
 };
+_Pressed.prototype.onMouseUp.transitions = ['Ready'];
 
 _Pressed.prototype.onMouseMove = function (controller) {
 
     controller.changeState(Pan);
     controller.state.onMouseMove(controller);
 };
+_Pressed.prototype.onMouseMove.transitions = ['Pan'];
 
 
 _Pan.prototype.onMouseMove = function (controller) {
@@ -146,4 +145,5 @@ _Pan.prototype.onMouseUp = function (controller) {
     controller.changeState(Ready);
 
 };
+_Pan.prototype.onMouseUp.transitions = ['Ready'];
 

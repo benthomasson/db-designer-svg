@@ -509,9 +509,11 @@ _Connecting.prototype.onMouseUp = function (controller) {
         controller.changeState(Ready);
     }
 };
+_Connecting.prototype.onMouseUp.transitions = ['Ready', 'Connected'];
 
 _Connected.prototype.start = function (controller) {
 
     controller.scope.clear_selections();
     controller.changeState(Ready);
 };
+_Connected.prototype.start.transitions = ['Ready'];
