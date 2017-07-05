@@ -67,14 +67,14 @@ _Ready.prototype.onMouseDown = function (controller) {
 };
 _Ready.prototype.onMouseDown.transitions = ['Pressed'];
 
-_Ready.prototype.onMouseWheel = function (controller, event, delta, deltaX, deltaY) {
+_Ready.prototype.onMouseWheel = function (controller, msg_type, $event) {
 
     controller.changeState(Scale);
-    controller.state.onMouseWheel(controller, event, delta, deltaX, deltaY);
+    controller.handle_message(msg_type, $event);
 };
 _Ready.prototype.onMouseWheel.transitions = ['Scale'];
 
-_Ready.prototype.onKeyDown = function(controller, $event) {
+_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
 	var scope = controller.scope;
 
@@ -102,7 +102,8 @@ _Start.prototype.start.transitions = ['Ready'];
 
 
 
-_Scale.prototype.onMouseWheel = function (controller, event, delta) {
+_Scale.prototype.onMouseWheel = function (controller, msg_type, message) {
+      var delta = message[1];
       var new_scale = Math.max(0.1, Math.min(10, (controller.scope.current_scale + delta / 100)));
       var new_panX = controller.scope.mouseX - new_scale * ((controller.scope.mouseX - controller.scope.panX) / controller.scope.current_scale);
       var new_panY = controller.scope.mouseY - new_scale * ((controller.scope.mouseY - controller.scope.panY) / controller.scope.current_scale);
@@ -123,10 +124,10 @@ _Pressed.prototype.onMouseUp = function (controller) {
 };
 _Pressed.prototype.onMouseUp.transitions = ['Ready'];
 
-_Pressed.prototype.onMouseMove = function (controller) {
+_Pressed.prototype.onMouseMove = function (controller, msg_type, $event ) {
 
     controller.changeState(Pan);
-    controller.state.onMouseMove(controller);
+    controller.handle_message(msg_type, $event);
 };
 _Pressed.prototype.onMouseMove.transitions = ['Pan'];
 

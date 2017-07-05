@@ -6,23 +6,6 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
-_State.prototype.onMouseMove = function (controller, $event) {
-    controller.next_controller.state.onMouseMove(controller.next_controller, $event);
-};
-_State.prototype.onMouseUp = function (controller, $event) {
-    controller.next_controller.state.onMouseUp(controller.next_controller, $event);
-};
-_State.prototype.onMouseDown = function (controller, $event) {
-    controller.next_controller.state.onMouseDown(controller.next_controller, $event);
-};
-_State.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
-    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
-};
-_State.prototype.onKeyDown = function (controller, $event) {
-    controller.next_controller.state.onKeyDown(controller.next_controller, $event);
-};
-
-
 function _Past () {
     this.name = 'Past';
 }
@@ -49,16 +32,8 @@ _Past.prototype.start = function (controller) {
     controller.scope.time_pointer = controller.scope.history.length - 1;
 };
 
-_Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
 
-    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
-    //controller.changeState(Present);
-
-};
-_Past.prototype.onMouseWheel.transitions = ['Present'];
-
-
-_Past.prototype.onMessage = function(controller, message) {
+_Past.prototype.onMessage = function(controller, msg_type, message) {
 
     //console.log(message.data);
     var type_data = JSON.parse(message.data);
@@ -74,36 +49,38 @@ _Past.prototype.onMessage = function(controller, message) {
         controller.changeState(Present);
         controller.scope.history.splice(controller.scope.time_pointer);
         if (data.sender !== controller.scope.client_id) {
-            controller.state.onMessage(controller, message);
+            controller.handle_message(msg_type, message);
         } else {
             controller.scope.history.push(message.data);
         }
+    } else {
+        controller.handle_message(type, data);
     }
+};
 
-    if (type === 'TableSelected') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableSelected(data);
-        }
+_Past.prototype.onTableSelected = function(controller, msg_type, message) {
+    if (message.sender !== controller.scope.client_id) {
+        controller.scope.onTableSelected(message);
     }
-    if (type === 'TableUnSelected') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableUnSelected(data);
-        }
+};
+_Past.prototype.onTableUnSelected = function(controller, msg_type, message) {
+    if (message.sender !== controller.scope.client_id) {
+        controller.scope.onTableUnSelected(message);
     }
+};
 
-    if (type === 'Undo') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
-            controller.scope.undo(data.original_message);
-        }
+_Past.prototype.onUndo = function(controller, msg_type, message) {
+    if (message.sender !== controller.scope.client_id) {
+        controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
+        controller.scope.undo(message.original_message);
     }
-    if (type === 'Redo') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.time_pointer = Math.min(controller.scope.history.length, controller.scope.time_pointer + 1);
-            controller.scope.redo(data.original_message);
-            if (controller.scope.time_pointer === controller.scope.history.length) {
-                controller.changeState(Present);
-            }
+};
+_Past.prototype.onRedo = function(controller, msg_type, message) {
+    if (message.sender !== controller.scope.client_id) {
+        controller.scope.time_pointer = Math.min(controller.scope.history.length, controller.scope.time_pointer + 1);
+        controller.scope.redo(message.original_message);
+        if (controller.scope.time_pointer === controller.scope.history.length) {
+            controller.changeState(Present);
         }
     }
 };
@@ -119,7 +96,10 @@ _Past.prototype.onMultipleMessage = function(controller, msg_type, message) {
         }
 };
 
-_Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
+_Past.prototype.onMouseWheel = function (controller, msg_type, message) {
+
+    var $event = message[0];
+    var delta = message[1];
 
     if ($event.originalEvent.metaKey) {
         //console.log(delta);
@@ -129,13 +109,13 @@ _Past.prototype.onMouseWheel = function (controller, $event, delta, deltaX, delt
             this.redo(controller);
         }
     } else {
-        controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
+        controller.next_controller.handle_message(msg_type, message);
     }
 
 };
 _Past.prototype.onMouseWheel.transitions = ['Past'];
 
-_Past.prototype.onKeyDown = function(controller, $event) {
+_Past.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     //console.log($event);
 
@@ -152,7 +132,7 @@ _Past.prototype.onKeyDown = function(controller, $event) {
         this.redo(controller);
         return;
     } else {
-        controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+        controller.next_controller.handle_message(msg_type, $event);
     }
 };
 _Past.prototype.onKeyDown.transitions = ['Past'];
@@ -197,77 +177,85 @@ _Start.prototype.start = function (controller) {
 };
 _Start.prototype.start.transitions = ['Present'];
 
-_Present.prototype.onMessage = function(controller, message) {
+_Present.prototype.onMessage = function(controller, msg_type, message) {
 
     //console.log(message.data);
     var type_data = JSON.parse(message.data);
     var type = type_data[0];
     var data = type_data[1];
 
-    if (type === 'TableCreate') {
+    if (['TableCreate',
+         'TableDestroy',
+         'TableMove',
+         'TableLabelEdit',
+         'RelationCreate',
+         'RelationDestroy',
+         'ColumnCreate',
+         'ColumnDestroy',
+         'ColumnLabelEdit',
+         'Snapshot'].indexOf(type) !== -1) {
+
         controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableCreate(data);
-        }
     }
-    if (type === 'LinkCreate') {
-        controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onLinkCreate(data);
-        }
-    }
-    if (type === 'TableMove') {
-        controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableMove(data);
-        }
-    }
-    if (type === 'TableDestroy') {
-        controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableDestroy(data);
-        }
-    }
-    if (type === 'TableLabelEdit') {
-        controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableLabelEdit(data);
-        }
-    }
-    if (type === 'TableSelected') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableSelected(data);
-        }
-    }
-    if (type === 'TableUnSelected') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onTableUnSelected(data);
-        }
-    }
-    if (type === 'Undo') {
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
-            controller.scope.undo(data.original_message);
-            controller.changeState(Past);
-        }
-    }
-    if (type === 'Snapshot') {
-        controller.scope.history.push(message.data);
-        if (data.sender !== controller.scope.client_id) {
-            controller.scope.onSnapshot(data);
-        }
-    }
-    if (type === 'id') {
-        controller.scope.onClientId(data);
-    }
-    if (type === 'Database') {
-        controller.scope.onDatabase(data);
-    }
-    if (type === 'History') {
-        controller.scope.onHistory(data);
-    }
+     controller.handle_message(type, data);
 };
-_Present.prototype.onMessage.transitions = ['Past'];
+
+_Present.prototype.onTableCreate = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableCreate(message);
+	}
+};
+_Present.prototype.onRelationCreate = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onRelationCreate(message);
+	}
+};
+_Present.prototype.onTableMove = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableMove(message);
+	}
+};
+_Present.prototype.onTableDestroy = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableDestroy(message);
+	}
+};
+_Present.prototype.onTableLabelEdit = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableLabelEdit(message);
+	}
+};
+_Present.prototype.onTableSelected = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableSelected(message);
+	}
+};
+_Present.prototype.onTableUnSelected = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onTableUnSelected(message);
+	}
+};
+_Present.prototype.onUndo = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.time_pointer = Math.max(0, controller.scope.time_pointer - 1);
+		controller.scope.undo(message.original_message);
+		controller.changeState(Past);
+	}
+};
+_Present.prototype.onSnapshot = function(controller, msg_type, message) {
+	if (message.sender !== controller.scope.client_id) {
+		controller.scope.onSnapshot(message);
+	}
+};
+_Present.prototype.onid = function(controller, msg_type, message) {
+	controller.scope.onClientId(message);
+};
+_Present.prototype.onDatabase = function(controller, msg_type, message) {
+	controller.scope.onDatabase(message);
+};
+_Present.prototype.onHistory = function(controller, msg_type, message) {
+	controller.scope.onHistory(message);
+};
 
 _Present.prototype.onMultipleMessage = function(controller, msg_type, message) {
 
@@ -280,7 +268,10 @@ _Present.prototype.onMultipleMessage = function(controller, msg_type, message) {
     }
 };
 
-_Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
+_Present.prototype.onMouseWheel = function (controller, msg_type, message) {
+
+    var $event = message[0];
+    var delta = message[1];
 
     if ($event.originalEvent.metaKey) {
         //console.log(delta);
@@ -288,13 +279,13 @@ _Present.prototype.onMouseWheel = function (controller, $event, delta, deltaX, d
             this.undo(controller);
         }
     } else {
-        controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
+        controller.next_controller.handle_message(msg_type, message);
     }
 
 };
 _Present.prototype.onMouseWheel.transitions = ['Past'];
 
-_Present.prototype.onKeyDown = function(controller, $event) {
+_Present.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     //console.log($event);
 
@@ -305,7 +296,7 @@ _Present.prototype.onKeyDown = function(controller, $event) {
         this.undo(controller);
         return;
     } else {
-        controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+        controller.next_controller.handle_message(msg_type, $event);
     }
 };
 _Present.prototype.onKeyDown.transitions = ['Past'];

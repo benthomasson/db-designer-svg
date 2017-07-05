@@ -8,22 +8,6 @@ function _State () {
 }
 inherits(_State, fsm._State);
 
-_State.prototype.onMouseMove = function (controller, $event) {
-    controller.next_controller.state.onMouseMove(controller.next_controller, $event);
-};
-_State.prototype.onMouseUp = function (controller, $event) {
-    controller.next_controller.state.onMouseUp(controller.next_controller, $event);
-};
-_State.prototype.onMouseDown = function (controller, $event) {
-    controller.next_controller.state.onMouseDown(controller.next_controller, $event);
-};
-_State.prototype.onMouseWheel = function (controller, $event, delta, deltaX, deltaY) {
-    controller.next_controller.state.onMouseWheel(controller.next_controller, $event, delta, deltaX, deltaY);
-};
-_State.prototype.onKeyDown = function (controller, $event) {
-    controller.next_controller.state.onKeyDown(controller.next_controller, $event);
-};
-
 
 function _Ready () {
     this.name = 'Ready';
@@ -136,20 +120,20 @@ _Ready.prototype.start = function (controller) {
 
 };
 
-_Ready.prototype.onMouseDown = function (controller, $event) {
+_Ready.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     var selection = controller.scope.select_items($event.shiftKey);
 
     if (selection.last_selected_table !== null || selection.last_selected_relation !== null) {
         controller.changeState(Selected1);
     } else {
-        controller.next_controller.state.onMouseDown(controller.next_controller, $event);
+        controller.next_controller.handle_message(msg_type, $event);
     }
 };
 _Ready.prototype.onMouseDown.transitions = ['Selected1'];
 
 
-_Ready.prototype.onKeyDown = function(controller, $event) {
+_Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
 	var scope = controller.scope;
     var table = null;
@@ -189,7 +173,7 @@ _Ready.prototype.onKeyDown = function(controller, $event) {
         return;
     }
 
-	controller.next_controller.state.onKeyDown(controller.next_controller, $event);
+	controller.next_controller.handle_message(msg_type, $event);
 };
 
 _Start.prototype.start = function (controller) {
@@ -222,7 +206,7 @@ _Selected2.prototype.start = function (controller) {
 
 
 
-_Selected2.prototype.onMouseDown = function (controller, $event) {
+_Selected2.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     if (controller.scope.selected_tables.length === 1) {
         var current_selected_table = controller.scope.selected_tables[0];
@@ -234,11 +218,11 @@ _Selected2.prototype.onMouseDown = function (controller, $event) {
     }
 
     controller.changeState(Ready);
-    controller.state.onMouseDown(controller, $event);
+    controller.handle_message(msg_type, $event);
 };
 _Selected2.prototype.onMouseDown.transitions = ['Ready', 'Selected3'];
 
-_Selected2.prototype.onKeyDown = function (controller, $event) {
+_Selected2.prototype.onKeyDown = function (controller, msg_type, $event) {
 
     if ($event.keyCode === 8) {
         //Delete
@@ -289,7 +273,7 @@ _Selected2.prototype.onKeyDown = function (controller, $event) {
         }
     }
 };
-_Selected2.prototype.onMouseUp.transitions = ['Ready'];
+_Selected2.prototype.onKeyDown.transitions = ['Ready'];
 
 
 _Selected1.prototype.onMouseMove = function (controller) {
@@ -342,10 +326,10 @@ _Move.prototype.onMouseMove = function (controller) {
 };
 
 
-_Move.prototype.onMouseUp = function (controller, $event) {
+_Move.prototype.onMouseUp = function (controller, msg_type, $event) {
 
     controller.changeState(Selected2);
-    controller.state.onMouseUp(controller, $event);
+    controller.handle_message(msg_type, $event);
 };
 _Move.prototype.onMouseUp.transitions = ['Selected2'];
 
@@ -403,16 +387,16 @@ _EditLabel.prototype.end = function (controller) {
     table.update_positions();
 };
 
-_EditLabel.prototype.onMouseDown = function (controller, $event) {
+_EditLabel.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     controller.changeState(Ready);
-    controller.state.onMouseDown(controller, $event);
+    controller.handle_message(msg_type, $event);
 
 };
 _EditLabel.prototype.onMouseDown.transitions = ['Ready'];
 
 
-_EditLabel.prototype.onKeyDown = function (controller, $event) {
+_EditLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var table = controller.scope.selected_tables[0];
@@ -444,16 +428,16 @@ _EditColumnLabel.prototype.end = function (controller) {
     column.table.update_positions();
 };
 
-_EditColumnLabel.prototype.onMouseDown = function (controller, $event) {
+_EditColumnLabel.prototype.onMouseDown = function (controller, msg_type, $event) {
 
     controller.changeState(Ready);
-    controller.state.onMouseDown(controller, $event);
+    controller.handle_message(controller, msg_type, $event);
 
 };
 _EditColumnLabel.prototype.onMouseDown.transitions = ['Ready'];
 
 
-_EditColumnLabel.prototype.onKeyDown = function (controller, $event) {
+_EditColumnLabel.prototype.onKeyDown = function (controller, msg_type, $event) {
     //Key codes found here:
     //https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var column = controller.scope.selected_columns[0];
