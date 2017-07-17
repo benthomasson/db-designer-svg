@@ -53,10 +53,10 @@ def parse_value(value):
         else:
             return int(value)
     except ValueError:
-        try:
-            return bool(value)
-        except ValueError:
-            pass
+        if value in ["true", "True", "yes", 'Yes']:
+            return True
+        elif value in ["false", "False", "no", "No"]:
+            return False
     return value
 
 
