@@ -9,7 +9,7 @@ from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='/prototype/', permanent=False)),
+    url(r'^$', RedirectView.as_view(url='/prototype/', permanent=False), name="home"),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name="about"),
 
     # Django Admin, use {% url 'admin:index' %}
