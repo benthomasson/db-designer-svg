@@ -45,3 +45,8 @@ celery==3.1.19
 
 # Your custom requirements go here
 sqlparse==0.1.19
+
+jinja2-cli
+pyyaml
+autopep8
+flake8
