@@ -1,4 +1,5 @@
 <ul>
+    <li><a href="/static/prototype/index.html">New</a></li>
     {%for db in dbs%}
     <li><a href="/static/prototype/index.html#!?database_id={{db.pk}}">{{db.pk}} {{db.name}}</a></li>
     {%endfor%}
