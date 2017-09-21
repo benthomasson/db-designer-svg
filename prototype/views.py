@@ -172,7 +172,8 @@ def upload_db(data):
         column_count[column['table__name']] += 1
     for table in data.get('models', []):
         for i, column in enumerate(table.get('fields', [])):
-            if column.get('ref') and column.get('ref_field'):
+            if (column.get('ref') and column.get('ref_field') and
+                (column.get('ref'), column.get('ref_field')) in columns_map):
                 new_relation = Relation(id=relation_i,
                                         from_column_id=columns_map[(table['name'], column['name'])],
                                         to_column_id=columns_map[(column.get('ref'), column.get('ref_field'))])
