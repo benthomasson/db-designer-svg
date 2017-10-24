@@ -113,7 +113,7 @@ _Past.prototype.onMouseWheel = function (controller, msg_type, message) {
     }
 
 };
-_Past.prototype.onMouseWheel.transitions = ['Past'];
+_Past.prototype.onMouseWheel.transitions = ['Present'];
 
 _Past.prototype.onKeyDown = function(controller, msg_type, $event) {
 
@@ -135,7 +135,7 @@ _Past.prototype.onKeyDown = function(controller, msg_type, $event) {
         controller.next_controller.handle_message(msg_type, $event);
     }
 };
-_Past.prototype.onKeyDown.transitions = ['Past'];
+_Past.prototype.onKeyDown.transitions = ['Present'];
 
 
 _Past.prototype.undo = function(controller) {

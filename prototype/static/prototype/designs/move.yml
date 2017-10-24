@@ -1,101 +1,104 @@
-finite_state_machine_id: 78
+finite_state_machine_id: 18
 name: src/move
 states:
-- id: 5
-  label: Move
-  x: -360
-  y: 230
-- id: 7
+- id: 2
   label: EditLabel
   x: 296
   y: 275
-- id: 8
+- id: 3
   label: EditColumnLabel
   x: 561
   y: 265
-- id: 10
-  label: Connected
-  x: 13
-  y: -378
-- id: 3
+- id: 5
   label: Selected2
   x: 82
   y: 172
-- id: 2
+- id: 6
   label: Start
   x: 468
   y: -283
-- id: 4
+- id: 7
   label: Selected3
   x: 34
   y: 467
-- id: 1
+- id: 8
   label: Ready
   x: 357
   y: -26
-- id: 6
+- id: 4
+  label: Connected
+  x: 99
+  y: -502
+- id: 9
   label: Selected1
   x: 113
   y: -59
-- id: 9
+- id: 10
   label: Connecting
-  x: -299
-  y: -67
+  x: -595
+  y: -105
+- id: 1
+  label: Move
+  x: -361
+  y: 321
 transitions:
-- from_state: Ready
-  label: onMouseDown
-  to_state: Selected1
-- from_state: Start
-  label: start
-  to_state: Ready
-- from_state: Selected2
-  label: onMouseDown
-  to_state: Ready
-- from_state: Selected2
-  label: onMouseDown
-  to_state: Selected3
 - from_state: Selected3
   label: onMouseUp
   to_state: EditLabel
 - from_state: Selected3
   label: onMouseUp
   to_state: EditColumnLabel
-- from_state: Selected3
-  label: onMouseMove
-  to_state: Move
-- from_state: Selected3
-  label: onMouseMove
-  to_state: Connecting
+- from_state: EditColumnLabel
+  label: onKeyDown
+  to_state: Selected2
+- from_state: EditLabel
+  label: onKeyDown
+  to_state: Selected2
+- from_state: Selected1
+  label: onMouseUp
+  to_state: Selected2
 - from_state: Move
   label: onMouseUp
   to_state: Selected2
-- from_state: Selected1
-  label: onMouseMove
-  to_state: Move
-- from_state: Selected1
-  label: onMouseMove
-  to_state: Connecting
-- from_state: Selected1
-  label: onMouseUp
-  to_state: Selected2
-- from_state: EditLabel
+- from_state: Selected2
   label: onMouseDown
-  to_state: Ready
-- from_state: EditLabel
+  to_state: Selected3
+- from_state: Selected2
   label: onKeyDown
-  to_state: Selected2
-- from_state: EditColumnLabel
-  label: onMouseDown
   to_state: Ready
-- from_state: EditColumnLabel
-  label: onKeyDown
-  to_state: Selected2
+- from_state: Connected
+  label: start
+  to_state: Ready
 - from_state: Connecting
   label: onMouseUp
+  to_state: Ready
+- from_state: EditColumnLabel
+  label: onMouseDown
+  to_state: Ready
+- from_state: EditLabel
+  label: onMouseDown
+  to_state: Ready
+- from_state: Selected2
+  label: onMouseDown
+  to_state: Ready
+- from_state: Start
+  label: start
   to_state: Ready
 - from_state: Connecting
   label: onMouseUp
   to_state: Connected
-- from_state: Connected
-  label: start
-  to_state: Ready
+- from_state: Ready
+  label: onMouseDown
+  to_state: Selected1
+- from_state: Selected1
+  label: onMouseMove
+  to_state: Connecting
+- from_state: Selected3
+  label: onMouseMove
+  to_state: Connecting
+- from_state: Selected1
+  label: onMouseMove
+  to_state: Move
+- from_state: Selected3
+  label: onMouseMove
+  to_state: Move

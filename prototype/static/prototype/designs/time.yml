@@ -1,20 +1,18 @@
-app: time
-panX: 0
-panY: 0
-scaleXY: 1
+finite_state_machine_id: 19
+name: time
 states:
-- label: Start
-  size: 100
+- id: 3
+  label: Past
+  x: 296
+  y: 377
+- id: 1
+  label: Start
   x: 634
   y: 117
-- label: Present
-  size: 100
+- id: 2
+  label: Present
   x: 632
   y: 379
-- label: Past
-  size: 100
-  x: 367
-  y: 369
 transitions:
 - from_state: Start
   label: start
@@ -24,4 +22,10 @@ transitions:
   to_state: Past
 - from_state: Past
   label: onMouseWheel
+  to_state: Present
+- from_state: Present
+  label: onKeyDown
+  to_state: Past
+- from_state: Past
+  label: onKeyDown
   to_state: Present

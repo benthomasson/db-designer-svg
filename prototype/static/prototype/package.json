@@ -16,7 +16,8 @@
     "less": "",
     "mathjs": "",
     "text-width": "",
-    "to-snake-case": ""
+    "to-snake-case": "",
+    "yamljs": ""
   },
   "devDependencies": {
     "eslint": "^3.17.1",
