@@ -29,8 +29,8 @@ table_map = dict(x='x',
                  name='name')
 
 view_map = dict(panX='panX',
-                 panY='panY',
-                 name='scaleXY')
+                panY='panY',
+                scale='scaleXY')
 
 relation_map = dict(from_column__table__name="from_table",
                     to_column__table__name="to_table",
@@ -91,7 +91,7 @@ def download(request):
     if form.is_valid():
         database_id = form.cleaned_data['database_id']
         db = Database.objects.get(pk=database_id)
-        data['view'] = map(transform_view, (Database.objects.filter(pk=database_id).values('panX', 'panY', 'scale'))[0]
+        data['view'] = map(transform_view, (Database.objects.filter(pk=database_id).values('panX', 'panY', 'scale')))[0]
         data['app'] = db.name
         data['models'] = map(transform_table, list(Table.objects
                                                         .filter(database_id=database_id)
