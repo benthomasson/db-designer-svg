@@ -22,6 +22,9 @@ models:
   - default: 0
     name: column_id_seq
     type: IntegerField
+  - len: 200
+    name: display
+    type: CharField
   name: Table
   x: 348
   y: 124
@@ -122,6 +125,9 @@ models:
   - default: false
     name: is_indexed
     type: BooleanField
+  - len: 200
+    name: related_name
+    type: CharField
   name: Column
   x: 619
   y: 128

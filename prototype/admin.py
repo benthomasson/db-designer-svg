@@ -16,7 +16,7 @@ from prototype.models import Relation
 
 
 class TableAdmin(admin.ModelAdmin):
-    fields = ('name', 'x', 'y', 'id', 'database', 'column_id_seq',)
+    fields = ('name', 'x', 'y', 'id', 'database', 'column_id_seq', 'display',)
     raw_id_fields = ('database',)
 
 
@@ -56,7 +56,8 @@ admin.site.register(MessageType, MessageTypeAdmin)
 
 
 class ColumnAdmin(admin.ModelAdmin):
-    fields = ('id', 'name', 'type', 'table', 'is_pk', 'is_unique', 'has_default', 'default_value', 'is_indexed',)
+    fields = ('id', 'name', 'type', 'table', 'is_pk', 'is_unique',
+              'has_default', 'default_value', 'is_indexed', 'related_name',)
     raw_id_fields = ('table',)
 
 

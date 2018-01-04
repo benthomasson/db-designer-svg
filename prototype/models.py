@@ -10,6 +10,7 @@ class Table(models.Model):
     id = models.IntegerField()
     database = models.ForeignKey('Database',)
     column_id_seq = models.IntegerField(default=0)
+    display = models.CharField(max_length=200, )
 
     def __unicode__(self):
         return self.name
@@ -66,6 +67,7 @@ class Column(models.Model):
     has_default = models.BooleanField(default=False)
     default_value = models.TextField()
     is_indexed = models.BooleanField(default=False)
+    related_name = models.CharField(max_length=200, )
 
 
 class Relation(models.Model):
