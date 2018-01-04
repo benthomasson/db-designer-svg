@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('prototype', '0001_initial'), ('prototype', '0002_remove_topology_id'), ('prototype', '0003_device_type'), ('prototype', '0004_client_messagetype_topologyhistory'), ('prototype', '0005_topologyhistory_undone'), ('prototype', '0006_auto_20170321_1236'), ('prototype', '0007_auto_20170627_1903'), ('prototype', '0008_auto_20170627_2017'), ('prototype', '0009_auto_20170628_1913'), ('prototype', '0010_auto_20170628_1922'), ('prototype', '0011_auto_20170630_1814')]
 
     dependencies = [
     ]
