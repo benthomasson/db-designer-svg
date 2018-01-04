@@ -26,7 +26,8 @@ def index(request):
 
 table_map = dict(x='x',
                  y='y',
-                 name='name')
+                 name='name',
+                 display='display')
 
 view_map = dict(panX='panX',
                 panY='panY',
@@ -38,7 +39,8 @@ relation_map = dict(from_column__table__name="from_table",
                     from_column__name="from_column")
 
 column_map = dict(name='name',
-                  table__name='table')
+                  table__name='table',
+                  related_name='related_name')
 
 
 def transform_dict(dict_map, d):
@@ -67,6 +69,8 @@ def parse_value(value):
 
 def transform_column2(column):
     d = dict()
+    if column.get('related_name', None):
+        d['related_name'] = column.get('related_name', '')
     name_parts = column['name'].split(':')
     d['name'] = name_parts.pop(0)
     if name_parts:
@@ -99,17 +103,23 @@ def download(request):
                                                         .values('x',
                                                                 'y',
                                                                 'name',
-                                                                'id')))
+                                                                'id',
+                                                                'display')))
 
         for table in data['models']:
+            if not table['display']:
+                del table['display']
             table['fields'] = []
             table_map[table['name']] = table
         columns = map(transform_column, list(Column.objects
                                              .filter(table__database_id=database_id)
                                              .order_by('id')
                                              .values('table__name',
-                                                     'name')))
+                                                     'name',
+                                                     'related_name')))
         for column in columns:
+            if not column['related_name']:
+                del column['related_name']
             if column['name']:
                 column2 = transform_column2(column)
                 table_map[column['table']]['fields'].append(column2)
@@ -146,7 +156,8 @@ def upload_db(data):
                           name=table.get('name'),
                           id=i + 1,
                           x=table.get('x', 0),
-                          y=table.get('y', 0))
+                          y=table.get('y', 0),
+                          display=table.get('display', ''))
         tables.append(new_table)
     Table.objects.bulk_create(tables)
     tables_map = dict(Table.objects
@@ -165,6 +176,7 @@ def upload_db(data):
             new_column = Column(name=new_column_name,
                                 id=i + 1,
                                 type=column.get('type', ''),
+                                related_name=column.get('related_name', ''),
                                 table_id=tables_map[table['name']])
             columns.append(new_column)
 
