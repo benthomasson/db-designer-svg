@@ -28,6 +28,10 @@ table_map = dict(x='x',
                  y='y',
                  name='name')
 
+view_map = dict(panX='panX',
+                 panY='panY',
+                 name='scaleXY')
+
 relation_map = dict(from_column__table__name="from_table",
                     to_column__table__name="to_table",
                     to_column__name="to_column",
@@ -41,6 +45,7 @@ def transform_dict(dict_map, d):
     return {to_key: d[from_key] for from_key, to_key in dict_map.iteritems()}
 
 
+transform_view = partial(transform_dict, view_map)
 transform_table = partial(transform_dict, table_map)
 transform_relation = partial(transform_dict, relation_map)
 transform_column = partial(transform_dict, column_map)
@@ -79,13 +84,14 @@ def transform_column2(column):
 
 
 def download(request):
-    data = dict(models=[])
+    data = dict(models=[], external_models=[], modules=[], view={})
     table_map = dict()
     column_map = dict()
     form = DBForm(request.GET)
     if form.is_valid():
         database_id = form.cleaned_data['database_id']
         db = Database.objects.get(pk=database_id)
+        data['view'] = map(transform_view, (Database.objects.filter(pk=database_id).values('panX', 'panY', 'scale'))[0]
         data['app'] = db.name
         data['models'] = map(transform_table, list(Table.objects
                                                         .filter(database_id=database_id)
