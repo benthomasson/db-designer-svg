@@ -145,6 +145,11 @@ def download(request):
 def upload_db(data):
     db = Database(scale=1.0, panX=0, panY=0)
     db.name = data.get('name', data.get("app", "db"))
+    if data.get('view', False):
+        view = data['view']
+        db.scale=view.get('scaleXY', 1.0)
+        db.panX=view.get('panX', 0)
+        db.panY=view.get('panY', 0)
     db.save()
     tables = []
     columns = []
