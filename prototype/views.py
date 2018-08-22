@@ -147,9 +147,9 @@ def upload_db(data):
     db.name = data.get('name', data.get("app", "db"))
     if data.get('view', False):
         view = data['view']
-        db.scale=view.get('scaleXY', 1.0)
-        db.panX=view.get('panX', 0)
-        db.panY=view.get('panY', 0)
+        db.scale = view.get('scaleXY', 1.0)
+        db.panX = view.get('panX', 0)
+        db.panY = view.get('panY', 0)
     db.save()
     tables = []
     columns = []
@@ -195,13 +195,15 @@ def upload_db(data):
         column_count[column['table__name']] += 1
     for table in data.get('models', []):
         for i, column in enumerate(table.get('fields', [])):
-            if (column.get('ref') and column.get('ref_field') and
-                (column.get('ref'), column.get('ref_field')) in columns_map):
-                new_relation = Relation(id=relation_i,
-                                        from_column_id=columns_map[(table['name'], column['name'])],
-                                        to_column_id=columns_map[(column.get('ref'), column.get('ref_field'))])
-                relations.append(new_relation)
-                relation_i += 1
+            if (column.get('ref') and column.get('ref_field')):
+                if ((column.get('ref'), column.get('ref_field')) in columns_map):
+                    new_relation = Relation(id=relation_i,
+                                            from_column_id=columns_map[(table['name'], column['name'])],
+                                            to_column_id=columns_map[(column.get('ref'), column.get('ref_field'))])
+                    relations.append(new_relation)
+                    relation_i += 1
+                else:
+                    print ("Error could not find %s %s in columns_map" % (column.get('ref'), column.get('ref_field')))
 
     Relation.objects.bulk_create(relations)
     for table in Table.objects.filter(database_id=db.pk):
