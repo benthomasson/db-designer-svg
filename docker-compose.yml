@@ -3,17 +3,19 @@ services:
     postgres:
       image: postgres:9.4
       volumes:
-          - /data/db-designer-svg/postgres:/var/lib/postgresql/data
+          - ~/data/db-designer-svg/postgres:/var/lib/postgresql/data
       env_file: .env
 
     django:
       build: .
+      image: benthomasson/db-designer-svg
       user: django
       links:
         - postgres
       command: /runserver.sh
       env_file: .env
       volumes:
+          - .:/app
           - static-files:/app/staticfiles
 
     nginx:
