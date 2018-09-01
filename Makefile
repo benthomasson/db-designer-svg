@@ -6,7 +6,7 @@ tools:
 	sudo npm i -g jshint
 
 ui:
-	cd prototype/static/prototype; npm i; make
+	cd prototype_front_end; npm i; make
 
 
 docker-compose-build: ui

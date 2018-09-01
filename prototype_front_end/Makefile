@@ -1,4 +1,4 @@
-.PHONY: all main lint lessc extract diff
+.PHONY: all main lint lessc deploy extract diff
 
 all: clean lessc lint main
 
@@ -31,3 +31,9 @@ diff:
 	fsm_diff designs/move.yml extracted/move.yml
 	fsm_diff designs/time.yml extracted/time.yml
 	fsm_diff designs/view.yml extracted/view.yml
+
+deploy: main
+	rsync -av js ../prototype/static/prototype/
+	rsync -av css ../prototype/static/prototype/
+	rsync -av index.html ../prototype/static/prototype/
+	rsync -av favicon.ico ../prototype/static/prototype/
