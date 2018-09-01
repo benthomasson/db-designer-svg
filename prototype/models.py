@@ -25,6 +25,7 @@ class Database(models.Model):
     panY = models.FloatField()
     table_id_seq = models.IntegerField(default=0)
     relation_id_seq = models.IntegerField(default=0)
+    uuid = models.CharField(max_length=40, )
 
     def __unicode__(self):
         return self.name

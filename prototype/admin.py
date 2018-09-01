@@ -24,7 +24,7 @@ admin.site.register(Table, TableAdmin)
 
 
 class DatabaseAdmin(admin.ModelAdmin):
-    fields = ('name', 'scale', 'panX', 'panY', 'table_id_seq', 'relation_id_seq',)
+    fields = ('name', 'scale', 'panX', 'panY', 'table_id_seq', 'relation_id_seq', 'uuid',)
     raw_id_fields = ()
 
 

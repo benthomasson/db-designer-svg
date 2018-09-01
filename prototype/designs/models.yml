@@ -48,6 +48,9 @@ models:
   - default: 0
     name: relation_id_seq
     type: IntegerField
+  - len: 40
+    name: uuid
+    type: CharField
   name: Database
   x: 111
   y: 127
@@ -152,6 +155,6 @@ models:
   y: 132
 modules: []
 view:
-  panX: 545.3656311541137
+  panX: 545.365631154114
   panY: 311.082263025521
-  scaleXY: 0.6200000000000001
+  scaleXY: 0.62
