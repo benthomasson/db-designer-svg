@@ -133,7 +133,8 @@ def download(request):
                                                                  'to_column__name')))
         for relation in relations:
             column_map[(relation['from_table'], relation['from_column'])]['ref'] = relation['to_table']
-            column_map[(relation['from_table'], relation['from_column'])]['ref_field'] = relation['to_column'].split(':')[0]
+            column_map[(relation['from_table'],
+                        relation['from_column'])]['ref_field'] = relation['to_column'].split(':')[0]
         response = HttpResponse(yaml.safe_dump(data, default_flow_style=False),
                                 content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{0}.yml"'.format(db.name)

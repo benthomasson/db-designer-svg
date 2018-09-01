@@ -66,7 +66,7 @@ def ws_connect(message):
                                   .exclude(undone=True)
                                   .order_by('pk')
                                   .values_list('message_data', flat=True)[:1000])
-    #message.reply_channel.send({"text": json.dumps(["History", history])})
+    message.reply_channel.send({"text": json.dumps(["History", history])})
 
 
 @channel_session
@@ -182,7 +182,6 @@ class _Persistence(object):
                                      defaults=column)
         t.column_id_seq = column['id']
         t.save()
-
 
     def onColumnDestroy(self, column, database_id, client_id):
         t = Table.objects.get(database_id=database_id, id=column['table_id'])

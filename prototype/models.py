@@ -73,6 +73,6 @@ class Column(models.Model):
 class Relation(models.Model):
 
     relation_id = models.AutoField(primary_key=True,)
-    from_column = models.ForeignKey('Column',  related_name='+', )
-    to_column = models.ForeignKey('Column',  related_name='+', )
+    from_column = models.ForeignKey('Column', related_name='+', )
+    to_column = models.ForeignKey('Column', related_name='+', )
     id = models.IntegerField()

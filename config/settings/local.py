@@ -8,6 +8,7 @@ Local settings
 - Add django-extensions as app
 '''
 
+from .common import env, TEMPLATES, MIDDLEWARE_CLASSES, INSTALLED_APPS
 from .common import *  # noqa
 
 # DEBUG
@@ -59,9 +60,7 @@ INSTALLED_APPS += ('django_extensions', )
 # ------------------------------------------------------------------------------
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-########## CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
 CELERY_ALWAYS_EAGER = True
-########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings

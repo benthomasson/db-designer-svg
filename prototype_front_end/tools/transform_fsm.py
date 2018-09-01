@@ -40,6 +40,7 @@ def transform_fsm(data):
 
     return data
 
+
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
@@ -64,4 +65,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
-
