@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 import yaml
+import uuid
 from prototype.models import Database, Table, Column, Relation
 
 from functools import partial
@@ -11,7 +12,7 @@ from django import forms
 
 
 class DBForm(forms.Form):
-    database_id = forms.IntegerField()
+    database_id = forms.CharField()
 
 
 class UploadFileForm(forms.Form):
@@ -93,12 +94,12 @@ def download(request):
     column_map = dict()
     form = DBForm(request.GET)
     if form.is_valid():
-        database_id = form.cleaned_data['database_id']
-        db = Database.objects.get(pk=database_id)
-        data['view'] = map(transform_view, (Database.objects.filter(pk=database_id).values('panX', 'panY', 'scale')))[0]
+        database_uuid = form.cleaned_data['database_id']
+        db = Database.objects.get(uuid=database_uuid)
+        data['view'] = map(transform_view, (Database.objects.filter(pk=db.pk).values('panX', 'panY', 'scale')))[0]
         data['app'] = db.name
         data['models'] = map(transform_table, list(Table.objects
-                                                        .filter(database_id=database_id)
+                                                        .filter(database_id=db.pk)
                                                         .order_by('id')
                                                         .values('x',
                                                                 'y',
@@ -112,7 +113,7 @@ def download(request):
             table['fields'] = []
             table_map[table['name']] = table
         columns = map(transform_column, list(Column.objects
-                                             .filter(table__database_id=database_id)
+                                             .filter(table__database_id=db.pk)
                                              .order_by('id')
                                              .values('table__name',
                                                      'name',
@@ -126,7 +127,7 @@ def download(request):
                 column_map[(column['table'], column['name'])] = column2
 
         relations = map(transform_relation, list(Relation.objects
-                                                         .filter(from_column__table__database_id=database_id)
+                                                         .filter(from_column__table__database_id=db.pk)
                                                          .values('from_column__table__name',
                                                                  'from_column__name',
                                                                  'to_column__table__name',
@@ -144,7 +145,7 @@ def download(request):
 
 
 def upload_db(data):
-    db = Database(scale=1.0, panX=0, panY=0)
+    db = Database(scale=1.0, panX=0, panY=0, uuid=uuid.uuid4())
     db.name = data.get('name', data.get("app", "db"))
     if data.get('view', False):
         view = data['view']
@@ -213,7 +214,7 @@ def upload_db(data):
     db.table_id_seq = len(tables)
     db.relation_id_seq = len(relations)
     db.save()
-    return db.pk
+    return db.uuid
 
 
 def upload(request):
@@ -224,6 +225,7 @@ def upload(request):
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
             db_id = upload_db(data)
+            print (db_id)
             return HttpResponseRedirect('/static/prototype/index.html#!?database_id={0}'.format(db_id))
     else:
         form = UploadFileForm()

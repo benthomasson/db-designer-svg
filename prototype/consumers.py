@@ -4,6 +4,7 @@ from channels.sessions import channel_session
 from prototype.models import Database, Table, Column, Relation, Client, DatabaseHistory, MessageType
 import urlparse
 from django.db.models import Q
+import uuid
 
 import json
 # Connected to websocket.connect
@@ -14,25 +15,22 @@ def ws_connect(message):
     # Accept connection
     message.reply_channel.send({"accept": True})
     data = urlparse.parse_qs(message.content['query_string'])
-    database_id = data.get('database_id', ['null'])
-    try:
-        database_id = int(database_id[0])
-    except ValueError:
-        database_id = None
-    if not database_id:
-        database_id = None
+    database_uuid = data.get('database_id', ['xxxx'])[0]
+    print (database_uuid, Database.objects.filter(uuid=database_uuid).values())
     database, created = Database.objects.get_or_create(
-        database_id=database_id, defaults=dict(name="database", scale=1.0, panX=0, panY=0))
+        uuid=database_uuid, defaults=dict(name="database", scale=1.0, panX=0, panY=0, uuid=str(uuid.uuid4())))
     database_id = database.database_id
+    print (database_id, created, database.uuid)
     message.channel_session['database_id'] = database_id
     Group("database-%s" % database_id).add(message.reply_channel)
     client = Client()
     client.save()
     message.channel_session['client_id'] = client.pk
     message.reply_channel.send({"text": json.dumps(["id", client.pk])})
-    message.reply_channel.send({"text": json.dumps(["database_id", database_id])})
+    message.reply_channel.send({"text": json.dumps(["database_uuid", database_uuid])})
     database_data = database.__dict__.copy()
     if '_state' in database_data:
+        database_data['database_id'] = database_data['uuid']
         del database_data['_state']
     message.reply_channel.send({"text": json.dumps(["Database", database_data])})
     tables = list(Table.objects
@@ -100,6 +98,7 @@ class _Persistence(object):
 
     def handle(self, message):
         database_id = message.get('database')
+        print (database_id)
         if database_id is None:
             print "No database_id"
             return
