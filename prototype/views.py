@@ -22,7 +22,7 @@ class UploadFileForm(forms.Form):
 
 
 def index(request):
-    return render(request, "prototype/index.html", dict(dbs=Database.objects.all().order_by('-pk')))
+    return HttpResponseRedirect('/static/prototype/index.html')
 
 
 table_map = dict(x='x',
