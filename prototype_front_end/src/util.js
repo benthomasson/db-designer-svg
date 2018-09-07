@@ -203,3 +203,13 @@ function pCase(x, y, x1, y1, x2, y2) {
   return param;
 }
 exports.pCase = pCase;
+
+function rectangle_is_selected (x, y) {
+
+    return (x > this.x &&
+            x < this.x + this.width &&
+            y > this.y &&
+            y < this.y + this.height);
+
+}
+exports.rectangle_is_selected = rectangle_is_selected;

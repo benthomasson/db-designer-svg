@@ -2,13 +2,15 @@
 //console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
-var view = require('./view.js');
-var move = require('./move.js');
-var buttons = require('./buttons.js');
-var time = require('./time.js');
+var view = require('./core/view.js');
+var move = require('./database/move.js');
+var buttons = require('./button/buttons.js');
+var time = require('./core/time.js');
 var util = require('./util.js');
-var models = require('./models.js');
-var messages = require('./messages.js');
+var b_models = require('./button/models.js');
+var db_models = require('./database/models.js');
+var messages = require('./core/messages.js');
+var db_messages = require('./database/messages.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
@@ -128,7 +130,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         $scope.selected_relations = [];
         for (i = 0; i < tables.length; i++) {
             if (tables[i].selected) {
-                $scope.send_control_message(new messages.TableUnSelected($scope.client_id, tables[i].id));
+                $scope.send_control_message(new db_messages.TableUnSelected($scope.client_id, tables[i].id));
             }
             tables[i].selected = false;
         }
@@ -158,7 +160,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         for (i = tables.length - 1; i >= 0; i--) {
             if (tables[i].is_selected($scope.scaledX, $scope.scaledY)) {
                 tables[i].selected = true;
-                $scope.send_control_message(new messages.TableSelected($scope.client_id, tables[i].id));
+                $scope.send_control_message(new db_messages.TableSelected($scope.client_id, tables[i].id));
                 last_selected_table = tables[i];
                 if ($scope.selected_tables.indexOf(tables[i]) === -1) {
                     $scope.selected_tables.push(tables[i]);
@@ -170,7 +172,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             for (j = 0; j < tables[i].columns.length; j++) {
                 if(tables[i].columns[j].is_selected($scope.scaledX, $scope.scaledY)) {
                     tables[i].selected = true;
-                    $scope.send_control_message(new messages.TableSelected($scope.client_id, tables[i].id));
+                    $scope.send_control_message(new db_messages.TableSelected($scope.client_id, tables[i].id));
                     last_selected_table = tables[i];
                     last_selected_column = tables[i].columns[j];
                     if ($scope.selected_tables.indexOf(tables[i]) === -1) {
@@ -191,7 +193,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             for (i = $scope.relations.length - 1; i >= 0; i--) {
                 if($scope.relations[i].is_selected($scope.scaledX, $scope.scaledY)) {
                     $scope.relations[i].selected = true;
-                    $scope.send_control_message(new messages.RelationSelected($scope.client_id, $scope.relations[i].id));
+                    $scope.send_control_message(new db_messages.RelationSelected($scope.client_id, $scope.relations[i].id));
                     last_selected_relation = $scope.relations[i];
                     if ($scope.selected_relations.indexOf($scope.relations[i]) === -1) {
                         $scope.selected_relations.push($scope.relations[i]);
@@ -309,8 +311,8 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     // Buttons
 
     $scope.buttons = [
-      new models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton),
-      new models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton)
+      new b_models.Button("Download", 10, 10, 60, 50, $scope.onDownloadButton),
+      new b_models.Button("Upload", 70, 10, 60, 50, $scope.onUploadButton)
     ];
 
 
@@ -319,7 +321,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
     };
 
     $scope.create_table = function(data) {
-        var table = new models.Table(data.id,
+        var table = new db_models.Table(data.id,
                                        data.name,
                                        data.x,
                                        data.y,
@@ -348,7 +350,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
     $scope.create_relation = function(data) {
         var i = 0;
-        var new_relation = new models.Relation($scope.relation_id_seq(), null, null);
+        var new_relation = new db_models.Relation($scope.relation_id_seq(), null, null);
         for (i = 0; i < $scope.tables.length; i++){
             if ($scope.tables[i].id === data.from_id) {
                 new_relation.from_table = $scope.tables[i];
@@ -476,7 +478,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
         }
 
         if (type === "TableDestroy") {
-            inverted_data = new messages.TableCreate(data.sender,
+            inverted_data = new db_messages.TableCreate(data.sender,
                                                       data.id,
                                                       data.previous_x,
                                                       data.previous_y,
@@ -579,7 +581,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             if (max_y === null || table.y > max_y) {
                 max_y = table.y;
             }
-            new_table = new models.Table(table.id,
+            new_table = new db_models.Table(table.id,
                                            table.name,
                                            table.x,
                                            table.y,
@@ -594,7 +596,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
         for (i = 0; i < data.columns.length; i++) {
             column = data.columns[i];
-            table_map[column.table__id].columns.push(new models.Column(table_map[column.table__id],
+            table_map[column.table__id].columns.push(new db_models.Column(table_map[column.table__id],
                                                                       column.id,
                                                                       column.name,
                                                                       column.type));
@@ -609,7 +611,7 @@ app.controller('MainCtrl', function($scope, $document, $location, $window) {
             if (max_relation_id === null || relation.id > max_relation_id) {
                 max_relation_id = relation.id;
             }
-            $scope.relations.push(new models.Relation(relation.id, table_map[relation.from_table].get_column(relation.from_column),
+            $scope.relations.push(new db_models.Relation(relation.id, table_map[relation.from_table].get_column(relation.from_column),
                                               table_map[relation.to_table].get_column(relation.to_column)));
         }
 

@@ -1,10 +1,4 @@
 
-
-function serialize(message) {
-    return JSON.stringify([message.constructor.name, message]);
-}
-exports.serialize = serialize;
-
 function TableMove(sender, id, x, y, previous_x, previous_y) {
 	this.msg_type = "TableMove";
     this.sender = sender;
@@ -126,24 +120,3 @@ function RelationUnSelected(sender, id) {
     this.id = id;
 }
 exports.RelationUnSelected = RelationUnSelected;
-
-function Undo(sender, original_message) {
-    this.msg_type = "Undo";
-    this.sender = sender;
-    this.original_message = original_message;
-}
-exports.Undo = Undo;
-
-function Redo(sender, original_message) {
-    this.msg_type = "Redo";
-    this.sender = sender;
-    this.original_message = original_message;
-}
-exports.Redo = Redo;
-
-function MultipleMessage(sender, messages) {
-    this.msg_type = "MultipleMessage";
-    this.sender = sender;
-    this.messages = messages;
-}
-exports.MultipleMessage = MultipleMessage;
