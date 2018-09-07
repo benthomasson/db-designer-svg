@@ -1,0 +1,20 @@
+<g ng-attr-transform="translate({{text.x}}, {{text.y}}) scale(1.0)">
+<g> <!-- text box -->
+<rect x=0 y=0 ng-attr-width="{{text.width}}" height=20 class="XUI__text_input_box" rx=2>
+</rect>
+</g> <!-- end text box -->
+<g ng-if="text.selected"> <!-- selection -->
+<rect x=0 y=0 ng-attr-width="{{text.width}}" height=20 class="XUI__text_input_box__selected2" rx=4>
+</rect>
+<rect x=0 y=0 ng-attr-width="{{text.width}}" height=20 class="XUI__text_input_box__selected1" rx=4>
+</rect>
+</g> <!-- end selection -->
+<g ng-if="text.text_selected"> <!-- text_selected -->
+<rect x=2 y=2 ng-attr-width="{{text.cursor_pos+10}}" height=16 class="XUI__text_input_text__selected">
+</rect>
+</g> <!-- end text_selection -->
+<g ng-if="text.cursor"> <!-- cursor -->
+<line ng-attr-x1="{{text.cursor_pos}}" ng-attr-x2="{{text.cursor_pos}}" y1=2 y2=18 class="XUI__text_input_cursor"></line>
+</g> <!-- end cursor -->
+<text id="text_{{text.id}}" x=5 y=15 class="XUI__text_input">{{text.value}}</text>
+</g>
