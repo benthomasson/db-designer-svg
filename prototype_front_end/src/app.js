@@ -9,14 +9,15 @@ var time = require('./time.js');
 var util = require('./util.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
+var ReconnectingWebSocket = require('reconnectingwebsocket');
 
 app.controller('MainCtrl', function($scope, $document, $location, $window) {
 
   $scope.database_id = $location.search().database_id || 0;
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new window.ReconnectingWebSocket("ws://" + window.location.host + "/prototype?database_id=" + $scope.database_id,
-                                                           null,
-                                                           {debug: false, reconnectInterval: 300});
+  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/prototype?database_id=" + $scope.database_id,
+                                                    null,
+                                                    {debug: false, reconnectInterval: 300});
   $scope.history = [];
   $scope.client_id = 0;
   $scope.onMouseDownResult = "";

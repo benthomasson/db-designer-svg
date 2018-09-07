@@ -7,8 +7,7 @@ clean:
 	rm -f css/style.css
 
 main:
-	browserify src/main.js  --standalone main -o js/bundle.js
-	cp vendor/*.js js/
+	webpack
 
 lint:
 	jshint --verbose src/*js
