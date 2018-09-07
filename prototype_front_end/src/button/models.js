@@ -1,6 +1,6 @@
 var fsm = require('../fsm.js');
 var util = require('../util.js');
-var button = require('./button.js');
+var button = require('./button.fsm.js');
 
 function Button(name, x, y, width, height, callback) {
     this.name = name;

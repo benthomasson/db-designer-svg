@@ -2,10 +2,10 @@
 //console.log = function () { };
 var app = angular.module('triangular', ['monospaced.mousewheel']);
 var fsm = require('./fsm.js');
-var view = require('./core/view.js');
-var move = require('./database/move.js');
-var buttons = require('./button/buttons.js');
-var time = require('./core/time.js');
+var view = require('./core/view.fsm.js');
+var move = require('./database/move.fsm.js');
+var buttons = require('./button/buttons.fsm.js');
+var time = require('./core/time.fsm.js');
 var util = require('./util.js');
 var b_models = require('./button/models.js');
 var db_models = require('./database/models.js');
