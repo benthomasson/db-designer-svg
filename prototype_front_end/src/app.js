@@ -1,42 +1,22 @@
 
 var controller = require('./controller.js');
+var cursor = require('./core/cursor.directive.js');
+var debug = require('./core/debug.directive.js');
+var quadrants = require('./core/quadrants.directive.js');
+var upload = require('./button/upload.directive.js');
+var download = require('./button/download.directive.js');
+var table = require('./database/table.directive.js');
+var relation = require('./database/relation.directive.js');
 
 
-var app = angular.module('triangular', ['monospaced.mousewheel']);
-
-app.controller('MainCtrl', controller.MainCtrl);
-
-app.directive('cursor', function() {
-  return { restrict: 'A', templateUrl: 'widgets/cursor.html' };
-});
-
-app.directive('debug', function() {
-  return { restrict: 'A', templateUrl: 'widgets/debug.html' };
-});
-
-app.directive('relation', function() {
-  return { restrict: 'A', templateUrl: 'widgets/relation.html' };
-});
-
-app.directive('table', function() {
-  return { restrict: 'A', templateUrl: 'widgets/table.html' };
-});
-
-app.directive('quadrants', function() {
-  return { restrict: 'A', templateUrl: 'widgets/quadrants.html' };
-});
-
-app.directive('button', function() {
-  return { restrict: 'A', templateUrl: 'widgets/button.html' };
-});
-
-app.directive('download', function() {
-      return { restrict: 'A', templateUrl: 'widgets/download.svg' };
-});
-
-app.directive('upload', function() {
-      return { restrict: 'A', templateUrl: 'widgets/upload.svg' };
-});
-
+var app = angular.module('triangular', ['monospaced.mousewheel'])
+                 .controller('MainCtrl', controller.MainCtrl)
+                 .directive('cursor', cursor.cursor)
+                 .directive('debug', debug.debug)
+                 .directive('quadrants', quadrants.quadrants)
+                 .directive('upload', upload.upload)
+                 .directive('download', download.download)
+                 .directive('table', table.table)
+                 .directive('relation', relation.relation);
 
 exports.app = app;

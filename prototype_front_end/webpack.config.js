@@ -2,6 +2,9 @@ const path = require('path');
 const webpack = require('webpack');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const SRC_PATH = path.resolve(__dirname, 'src');
+const CORE_PATH = path.resolve(SRC_PATH, 'core');
+const DATABASE_PATH = path.resolve(SRC_PATH, 'database');
+const BUTTON_PATH = path.resolve(SRC_PATH, 'button');
 module.exports = {
     devtool: 'source-map',
     entry: {
@@ -61,8 +64,15 @@ module.exports = {
         ]
     },
     plugins: [
-         new HardSourceWebpackPlugin(),
+         //new HardSourceWebpackPlugin({cacheDirectory: 'node_modules/.cache/hard-source/[confighash]'}),
          new webpack.ProvidePlugin({Hamster: 'hamsterjs'}),
          new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' })
-    ]
+    ],
+    resolve: {
+        alias: {
+            '~core': CORE_PATH,
+            '~database': DATABASE_PATH,
+            '~button': BUTTON_PATH,
+        }
+    }
 };
