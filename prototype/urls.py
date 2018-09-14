@@ -1,10 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 app_name = 'prototype'
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^download$', views.download, name='download'),
-    url(r'^upload$', views.upload, name='upload'),
+    path(r'', views.index, name='index'),
+    path(r'download', views.download, name='download'),
+    path(r'upload', views.upload, name='upload'),
 ]

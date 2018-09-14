@@ -2,6 +2,7 @@ var inherits = require('inherits');
 var fsm = require('../fsm.js');
 var models = require('./models.js');
 var messages = require('./messages.js');
+var core_messages = require('../core/messages.js');
 var snake = require('to-snake-case');
 
 function _State () {
@@ -155,7 +156,7 @@ _Ready.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     if (table !== null) {
         scope.tables.push(table);
-        scope.send_control_message(new messages.MultipleMessage(scope.client_id,
+        scope.send_control_message(new core_messages.MultipleMessage(scope.client_id,
                                                                 [new messages.TableCreate(scope.client_id,
                                                                                           table.id,
                                                                                           table.x,

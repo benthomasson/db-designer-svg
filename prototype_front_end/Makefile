@@ -6,11 +6,14 @@ clean:
 	rm -f js/bundle.js
 	rm -f css/style.css
 
+install:
+	npm i
+
 main:
 	webpack
 
 lint:
-	jshint --verbose src/*js
+	jshint --verbose src/**/*.js
 
 lessc:
 	lessc src/style.less css/style.css
@@ -36,4 +39,4 @@ deploy: main
 	rsync -av css ../prototype/static/prototype/
 	rsync -av index.html ../prototype/static/prototype/
 	rsync -av favicon.ico ../prototype/static/prototype/
-	docker-compose run --rm django ./manage.py collectstatic --noinput
+	docker-compose -f ../local.yml run --rm django ./manage.py collectstatic --noinput

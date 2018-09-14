@@ -2,13 +2,17 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 import yaml
 import uuid
+import logging
 from prototype.models import Database, Table, Column, Relation
 
 from functools import partial
 from collections import defaultdict
+from pprint import pformat
 
 
 from django import forms
+
+logger = logging.getLogger("prototype.views")
 
 
 class DBForm(forms.Form):
@@ -45,7 +49,7 @@ column_map = dict(name='name',
 
 
 def transform_dict(dict_map, d):
-    return {to_key: d[from_key] for from_key, to_key in dict_map.iteritems()}
+    return {to_key: d[from_key] for from_key, to_key in dict_map.items()}
 
 
 transform_view = partial(transform_dict, view_map)
@@ -96,28 +100,28 @@ def download(request):
     if form.is_valid():
         database_uuid = form.cleaned_data['database_id']
         db = Database.objects.get(uuid=database_uuid)
-        data['view'] = map(transform_view, (Database.objects.filter(pk=db.pk).values('panX', 'panY', 'scale')))[0]
+        data['view'] = list(map(transform_view, (Database.objects.filter(pk=db.pk).values('panX', 'panY', 'scale'))))[0]
         data['app'] = db.name
-        data['models'] = map(transform_table, list(Table.objects
+        data['models'] = list(map(transform_table, list(Table.objects
                                                         .filter(database_id=db.pk)
                                                         .order_by('id')
                                                         .values('x',
                                                                 'y',
                                                                 'name',
                                                                 'id',
-                                                                'display')))
+                                                                'display'))))
 
         for table in data['models']:
             if not table['display']:
                 del table['display']
             table['fields'] = []
             table_map[table['name']] = table
-        columns = map(transform_column, list(Column.objects
+        columns = list(map(transform_column, list(Column.objects
                                              .filter(table__database_id=db.pk)
                                              .order_by('id')
                                              .values('table__name',
                                                      'name',
-                                                     'related_name')))
+                                                     'related_name'))))
         for column in columns:
             if not column['related_name']:
                 del column['related_name']
@@ -126,12 +130,12 @@ def download(request):
                 table_map[column['table']]['fields'].append(column2)
                 column_map[(column['table'], column['name'])] = column2
 
-        relations = map(transform_relation, list(Relation.objects
+        relations = list(map(transform_relation, list(Relation.objects
                                                          .filter(from_column__table__database_id=db.pk)
                                                          .values('from_column__table__name',
                                                                  'from_column__name',
                                                                  'to_column__table__name',
-                                                                 'to_column__name')))
+                                                                 'to_column__name'))))
         for relation in relations:
             column_map[(relation['from_table'], relation['from_column'])]['ref'] = relation['to_table']
             column_map[(relation['from_table'],
@@ -172,7 +176,7 @@ def upload_db(data):
                            .values_list("name", "pk"))
     for table in data.get('models', []):
         for i, column in enumerate(table.get('fields', [])):
-            print column
+            print(column)
             new_column_name = column['name']
             if column.get('type'):
                 new_column_name += ":{0}".format(column.get('type'))
@@ -191,10 +195,12 @@ def upload_db(data):
     columns = list(Column.objects
                          .filter(table__database_id=db.pk)
                          .values("table__name", "name", "pk"))
+    logger.debug("columns %s", pformat(columns))
     columns_map = dict()
     for column in columns:
         columns_map[(column['table__name'], column['name'].split(":")[0])] = column['pk']
         column_count[column['table__name']] += 1
+    logger.debug("columns_map %s", pformat(columns_map))
     for table in data.get('models', []):
         for i, column in enumerate(table.get('fields', [])):
             if (column.get('ref') and column.get('ref_field')):
@@ -205,7 +211,7 @@ def upload_db(data):
                     relations.append(new_relation)
                     relation_i += 1
                 else:
-                    print ("Error could not find %s %s in columns_map" % (column.get('ref'), column.get('ref_field')))
+                    print("Error could not find %s %s in columns_map" % (column.get('ref'), column.get('ref_field')))
 
     Relation.objects.bulk_create(relations)
     for table in Table.objects.filter(database_id=db.pk):
@@ -219,13 +225,13 @@ def upload_db(data):
 
 def upload(request):
     if request.method == 'POST':
-        print request.POST
-        print request.FILES
+        print(request.POST)
+        print(request.FILES)
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = yaml.load(request.FILES['file'].read())
             db_id = upload_db(data)
-            print (db_id)
+            print(db_id)
             return HttpResponseRedirect('/static/prototype/index.html#!?database_id={0}'.format(db_id))
     else:
         form = UploadFileForm()

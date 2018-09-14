@@ -58,7 +58,7 @@ def main(args=None):
         with open(implementation, "a") as f:
             f.write(template.render(**data))
     else:
-        print (template.render(**data))
+        print(template.render(**data))
 
     return 0
 

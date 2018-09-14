@@ -9,7 +9,7 @@ var table = require('./database/table.directive.js');
 var relation = require('./database/relation.directive.js');
 
 
-var app = angular.module('triangular', ['monospaced.mousewheel'])
+var app = angular.module('dbdesignersvg', ['monospaced.mousewheel'])
                  .controller('MainCtrl', controller.MainCtrl)
                  .directive('cursor', cursor.cursor)
                  .directive('debug', debug.debug)

@@ -1,5 +1,5 @@
 
-const templateUrl = require('~button/upload.partial.svg');
+const templateUrl = require('~button/download.partial.svg');
 
 var download = function() {
   return { restrict: 'A', templateUrl};

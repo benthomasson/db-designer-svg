@@ -17,7 +17,7 @@ var MainCtrl = function($scope, $document, $location, $window) {
 
   $scope.database_id = $location.search().database_id || 0;
   // Create a web socket to connect to the backend server
-  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/prototype?database_id=" + $scope.database_id,
+  $scope.control_socket = new ReconnectingWebSocket("ws://" + window.location.host + "/ws/prototype?database_id=" + $scope.database_id,
                                                     null,
                                                     {debug: false, reconnectInterval: 300});
   $scope.history = [];
@@ -683,6 +683,7 @@ var MainCtrl = function($scope, $document, $location, $window) {
         message.sender = $scope.client_id;
         message.message_id = $scope.message_id_seq();
         var data = messages.serialize(message);
+        console.log(['sending', data]);
         $scope.control_socket.send(data);
     };
 

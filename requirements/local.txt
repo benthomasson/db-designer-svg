@@ -1,19 +1,31 @@
-# Local development dependencies go here
--r base.txt
-coverage==4.0.3
-django_coverage_plugin==1.1
-Sphinx
-django-extensions==1.5.9
-Werkzeug==0.11.2
-django-test-plus==1.0.11
-factory_boy==2.6.0
+-r ./base.txt
 
-# django-debug-toolbar that works with Django 1.5+
-django-debug-toolbar==1.4
+Werkzeug==0.14.1  # https://github.com/pallets/werkzeug
+ipdb==0.11  # https://github.com/gotcha/ipdb
+Sphinx==1.7.9  # https://github.com/sphinx-doc/sphinx
+psycopg2==2.7.4 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
 
-# improved REPL
-ipdb==0.8.1
+# Testing
+# ------------------------------------------------------------------------------
+mypy==0.620  # https://github.com/python/mypy
+pytest==3.8.0  # https://github.com/pytest-dev/pytest
+pytest-sugar==0.9.1  # https://github.com/Frozenball/pytest-sugar
 
+# Code quality
+# ------------------------------------------------------------------------------
+flake8==3.5.0  # https://github.com/PyCQA/flake8
+coverage==4.5.1  # https://github.com/nedbat/coveragepy
+
+# Django
+# ------------------------------------------------------------------------------
+factory-boy==2.11.1  # https://github.com/FactoryBoy/factory_boy
+
+django-debug-toolbar==1.10.1  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==2.1.2  # https://github.com/django-extensions/django-extensions
+django-coverage-plugin==1.6.0  # https://github.com/nedbat/django_coverage_plugin
+pytest-django==3.4.2  # https://github.com/pytest-dev/pytest-django
+
+# Code tools
+# ----------
 pyyaml
 jinja2-cli
-autopep8

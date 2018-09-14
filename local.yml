@@ -1,0 +1,40 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+  static-files: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: db_designer_svg_local_django
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: db_designer_svg_production_postgres
+    volumes:
+      - local_postgres_data:/Users/ben/data/db-designer-svg-py3/var/lib/postgresql/data
+      - local_postgres_data_backups:/Users/ben/data/db-designer-svg-py3/backups
+    env_file:
+      - ./.envs/.local/.postgres
+
+  redis:
+    image: redis:3.0
+    ports:
+        - "6379:6379"
