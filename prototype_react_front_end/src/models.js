@@ -6,6 +6,9 @@ var view_fsm = require('./core/view.fsm.js');
 var buttons_fsm = require('./button/buttons.fsm.js');
 var core_messages = require('./core/messages.js');
 var button_models = require('./button/models.js');
+var database_models = require('./database/models.js');
+var database_messages = require('./database/messages.js');
+var move_fsm = require('./database/move.fsm.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
 var history = require('history');
 
@@ -59,24 +62,19 @@ function ApplicationScope (svgFrame) {
   this.showHelp = true;
   this.showCursor = false;
   this.showButtons = true;
-  this.states = [];
-  this.transitions = [];
-  this.selected_items = [];
-  this.selected_states = [];
-  this.selected_transitions = [];
-  this.selected_groups = [];
-  this.channels = [];
-  this.groups = [];
-  this.client_id = 1;
-  this.state = this;
   this.diagram_id = 0;
+  this.client_id = 1;
   this.disconnected = process.env.REACT_APP_DISCONNECTED === 'true';
   this.websocket_host = process.env.REACT_APP_WEBSOCKET_HOST ? process.env.REACT_APP_WEBSOCKET_HOST : window.location.host;
   this.first_channel = null;
   this.history = [];
-  this.selecting_state = false;
+  this.selected_items = [];
   this.browser_history = history.createHashHistory({hashType: "hashbang"});
   console.log(this.browser_history.location);
+
+  this.last_selected_table = null;
+  this.tables = [];
+  this.relations = [];
 
   var split = this.browser_history.location.pathname.split('/');
   var last = split[split.length - 1];
@@ -105,10 +103,9 @@ function ApplicationScope (svgFrame) {
 
   //Create sequences
   this.trace_order_seq = util.natural_numbers(0);
-  this.state_id_seq = util.natural_numbers(0);
-  this.transition_id_seq = util.natural_numbers(0);
   this.message_id_seq = util.natural_numbers(0);
-  this.group_id_seq = util.natural_numbers(0);
+
+  this.table_id_seq = util.natural_numbers(0);
 
   //Create Buttons
   this.buttons_by_name = {
@@ -124,12 +121,14 @@ function ApplicationScope (svgFrame) {
   this.buttons_controller = new fsm.FSMController(this, 'buttons_fsm', buttons_fsm.Start, this);
   this.time_controller = new fsm.FSMController(this, 'time_fsm', time_fsm.Start, this);
   this.view_controller = new fsm.FSMController(this, 'view_fsm', view_fsm.Start, this);
+  this.move_controller = new fsm.FSMController(this, 'move_fsm', move_fsm.Start, this);
 
 
   //Wire up controllers
   //
   this.controllers = [this.view_controller,
                       this.hotkeys_controller,
+                      this.move_controller,
                       this.buttons_controller,
                       this.time_controller];
 
@@ -249,7 +248,7 @@ ApplicationScope.prototype.onKeyDown = function (e) {
 
 ApplicationScope.prototype.timer = function () {
   this.setState({
-    frameNumber: this.state.frameNumber + 1
+    frameNumber: this.frameNumber + 1
   });
   this.svgFrame.forceUpdate();
 };
@@ -268,6 +267,73 @@ ApplicationScope.prototype.clear_selections = function () {
 
 ApplicationScope.prototype.select_items = function (multiple_selection) {
 
+        var i = 0;
+        var j = 0;
+        var tables = this.tables;
+        var last_selected_table = null;
+        var last_selected_column = null;
+        var last_selected_relation = null;
+
+        this.pressedX = this.mouseX;
+        this.pressedY = this.mouseY;
+        this.pressedScaledX = this.scaledX;
+        this.pressedScaledY = this.scaledY;
+
+        if (!multiple_selection) {
+            this.clear_selections();
+        }
+
+        for (i = tables.length - 1; i >= 0; i--) {
+            if (tables[i].is_selected(this.scaledX, this.scaledY)) {
+                tables[i].selected = true;
+                this.send_control_message(new database_messages.TableSelected(this.client_id, tables[i].id));
+                last_selected_table = tables[i];
+                if (this.selected_tables.indexOf(tables[i]) === -1) {
+                    this.selected_tables.push(tables[i]);
+                }
+                if (!multiple_selection) {
+                    break;
+                }
+            }
+            for (j = 0; j < tables[i].columns.length; j++) {
+                if(tables[i].columns[j].is_selected(this.scaledX, this.scaledY)) {
+                    tables[i].selected = true;
+                    this.send_control_message(new database_messages.TableSelected(this.client_id, tables[i].id));
+                    last_selected_table = tables[i];
+                    last_selected_column = tables[i].columns[j];
+                    if (this.selected_tables.indexOf(tables[i]) === -1) {
+                        this.selected_tables.push(tables[i]);
+                    }
+                    if (this.selected_columns.indexOf(tables[i].columns[j]) === -1) {
+                        this.selected_columns.push(tables[i].columns[j]);
+                    }
+                    if (!multiple_selection) {
+                        break;
+                    }
+                }
+            }
+        }
+
+		// Do not select relations if a table was selected
+        if (last_selected_table === null) {
+            for (i = this.relations.length - 1; i >= 0; i--) {
+                if(this.relations[i].is_selected(this.scaledX, this.scaledY)) {
+                    this.relations[i].selected = true;
+                    this.send_control_message(new database_messages.RelationSelected(this.client_id, this.relations[i].id));
+                    last_selected_relation = this.relations[i];
+                    if (this.selected_relations.indexOf(this.relations[i]) === -1) {
+                        this.selected_relations.push(this.relations[i]);
+                        if (!multiple_selection) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return {last_selected_table: last_selected_table,
+                last_selected_relation: last_selected_relation,
+                last_selected_column: last_selected_column};
 };
 
 ApplicationScope.prototype.updateScaledXY = function() {
@@ -283,7 +349,7 @@ ApplicationScope.prototype.updatePanAndScale = function() {
 ApplicationScope.prototype.update_offsets = function () {
 
   var i = 0;
-  var transitions = this.state.transitions;
+  var transitions = this.transitions;
   var map = {};
   var transition = null;
   var key = null;
