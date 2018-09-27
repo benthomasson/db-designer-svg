@@ -6,6 +6,8 @@ import Download from './button/Download'
 import Quadrants from './core/Quadrants'
 import Help from './core/Help'
 import models from './models'
+import Table from './database/Table'
+import Relation from './database/Relation'
 
 
 class SVGFrame extends Component {
@@ -35,26 +37,19 @@ class SVGFrame extends Component {
       backgroundColor: '#ffffff',
       cursor: (this.scope.selecting_state ? 'alias' : 'auto')
     };
-    //var states = [];
-    //for (var i=0; i< this.scope.states.length; i++) {
-    //  states.push(<State {...this.scope.states[i]} key={'state' + i} showDebug={this.scope.showDebug}/>);
-    //}
-    //var transitions = [];
-    //for (i=0; i< this.scope.transitions.length; i++) {
-    //  transitions.push(<Transition {...this.scope.transitions[i]}
-    // /                              key={'transition' + i}
-    //                               showDebug={this.scope.showDebug}
-    //                               scaledX={this.scope.scaledX}
-    //                               scaledY={this.scope.scaledY} />);
-    //}
-    //var groups = [];
-    //for (i=0; i< this.scope.groups.length; i++) {
-    //  groups.push(<Group {...this.scope.groups[i]}
-    //                      key={'group' + i}
-    //                      showDebug={this.scope.showDebug}
-    //                      scaledX={this.scope.scaledX}
-    //                      scaledY={this.scope.scaledY} />);
-    //}
+    var tables = [];
+    for (var i=0; i< this.scope.tables.length; i++) {
+      tables.push(<Table {...this.scope.tables[i]} key={'table' + i} showDebug={this.scope.showDebug}/>);
+    }
+    var relations = [];
+    for (i=0; i< this.scope.relations.length; i++) {
+      relations.push(<Relation {...this.scope.relations[i]}
+                               key={'transition' + i}
+                               showDebug={this.scope.showDebug}
+                               scaledX={this.scope.scaledX}
+                               scaledY={this.scope.scaledY} />);
+    }
+
     return (
       <div className='SVGFrame'>
         <svg  id='frame' style={frameStyle}
@@ -73,6 +68,8 @@ class SVGFrame extends Component {
           <g transform={'translate(' + this.scope.panX + ',' + this.scope.panY + ') ' +
                          'scale(' + this.scope.current_scale + ')'}>
           <Quadrants {...this.scope} />
+          {relations}
+          {tables}
           </g>
           <Debug {...this.scope}
                  x={100}

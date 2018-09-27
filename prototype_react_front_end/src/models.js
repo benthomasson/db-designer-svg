@@ -6,7 +6,6 @@ var view_fsm = require('./core/view.fsm.js');
 var buttons_fsm = require('./button/buttons.fsm.js');
 var core_messages = require('./core/messages.js');
 var button_models = require('./button/models.js');
-var database_models = require('./database/models.js');
 var database_messages = require('./database/messages.js');
 var move_fsm = require('./database/move.fsm.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
@@ -72,7 +71,11 @@ function ApplicationScope (svgFrame) {
   this.browser_history = history.createHashHistory({hashType: "hashbang"});
   console.log(this.browser_history.location);
 
+  this.selected_tables = [];
+  this.selected_columns = [];
+  this.selected_relations = [];
   this.last_selected_table = null;
+  this.last_selected_column = null;
   this.tables = [];
   this.relations = [];
 
@@ -106,6 +109,7 @@ function ApplicationScope (svgFrame) {
   this.message_id_seq = util.natural_numbers(0);
 
   this.table_id_seq = util.natural_numbers(0);
+  this.relation_id_seq = util.natural_numbers(0);
 
   //Create Buttons
   this.buttons_by_name = {
@@ -262,7 +266,21 @@ ApplicationScope.prototype.onResize = function (e) {
 };
 
 ApplicationScope.prototype.clear_selections = function () {
-
+  var i = 0;
+  var tables = this.tables;
+  var relations = this.relations;
+  this.selected_tables = [];
+  this.selected_columns = [];
+  this.selected_relations = [];
+  for (i = 0; i < tables.length; i++) {
+      if (tables[i].selected) {
+          this.send_control_message(new database_messages.TableUnSelected(this.client_id, tables[i].id));
+      }
+      tables[i].selected = false;
+  }
+  for (i = 0; i < relations.length; i++) {
+      relations[i].selected = false;
+  }
 };
 
 ApplicationScope.prototype.select_items = function (multiple_selection) {

@@ -150,5 +150,4 @@ Relation.prototype.is_selected = function (x, y) {
     } else {
         return d < 10;
     }
-    return false;
 };

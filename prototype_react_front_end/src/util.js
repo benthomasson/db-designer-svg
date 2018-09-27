@@ -1,4 +1,5 @@
 /* Copyright (c) 2017 Red Hat, Inc. */
+var math = require('mathjs');
 
 function noop () {
 }
@@ -124,3 +125,13 @@ function rectangle_is_selected (x, y) {
 
 }
 exports.rectangle_is_selected = rectangle_is_selected;
+
+function cross_z_pos(x, y, x1, y1, x2, y2) {
+  var A = x - x1;
+  var B = y - y1;
+  var C = x2 - x1;
+  var D = y2 - y1;
+
+  return math.cross([A, B, 0], [C, D, 0])[2] > 0;
+}
+exports.cross_z_pos = cross_z_pos;

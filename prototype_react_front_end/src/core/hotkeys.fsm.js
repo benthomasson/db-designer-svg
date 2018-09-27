@@ -42,25 +42,25 @@ _Enabled.prototype.onKeyDown = function(controller, msg_type, $event) {
 
     if ($event.key === 'd') {
         scope.setState({
-          showDebug: !scope.state.showDebug,
+          showDebug: !scope.showDebug,
         });
         return;
     }
     if ($event.key === 'h') {
         scope.setState({
-          showHelp: !scope.state.showHelp
+          showHelp: !scope.showHelp
         });
         return;
     }
     else if ($event.key === 'p') {
         scope.setState({
-          showCursor: !scope.state.showCursor
+          showCursor: !scope.showCursor
         });
         return;
     }
     else if ($event.key === 'b') {
         scope.setState({
-          showButtons: !scope.state.showButtons
+          showButtons: !scope.showButtons
         });
         return;
     }
