@@ -309,8 +309,8 @@ _Present.prototype.onSnapshot = function(controller, msg_type, message) {
 _Present.prototype.onid = function(controller, msg_type, message) {
 	controller.scope.onClientId(message);
 };
-_Present.prototype.onDiagram = function(controller, msg_type, message) {
-	controller.scope.onDiagram(message);
+_Present.prototype.onDatabase = function(controller, msg_type, message) {
+	controller.scope.onDatabase(message);
 };
 _Present.prototype.onHistory = function(controller, msg_type, message) {
 	controller.scope.onHistory(message);

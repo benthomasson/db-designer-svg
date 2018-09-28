@@ -20,7 +20,7 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     ports:
-      - "8000:8000"
+      - "8001:8000"
     command: /start
 
   postgres:
@@ -36,5 +36,3 @@ services:
 
   redis:
     image: redis:3.0
-    ports:
-        - "6379:6379"

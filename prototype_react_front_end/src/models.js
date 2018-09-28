@@ -7,6 +7,7 @@ var buttons_fsm = require('./button/buttons.fsm.js');
 var core_messages = require('./core/messages.js');
 var button_models = require('./button/models.js');
 var database_messages = require('./database/messages.js');
+var database_models = require('./database/models.js');
 var move_fsm = require('./database/move.fsm.js');
 var ReconnectingWebSocket = require('reconnectingwebsocket');
 var history = require('history');
@@ -25,7 +26,7 @@ function ApplicationScope (svgFrame) {
   this.onKeyDown = this.onKeyDown.bind(this);
   this.onResize = this.onResize.bind(this);
   this.onHistory = this.onHistory.bind(this);
-  this.onDiagram = this.onDiagram.bind(this);
+  this.onDatabase = this.onDatabase.bind(this);
   this.onClientId =  this.onClientId.bind(this);
   this.onSnapshot =  this.onSnapshot.bind(this);
   this.update_offsets =  this.update_offsets.bind(this);
@@ -61,7 +62,7 @@ function ApplicationScope (svgFrame) {
   this.showHelp = true;
   this.showCursor = false;
   this.showButtons = true;
-  this.diagram_id = 0;
+  this.database_id = 0;
   this.client_id = 1;
   this.disconnected = process.env.REACT_APP_DISCONNECTED === 'true';
   this.websocket_host = process.env.REACT_APP_WEBSOCKET_HOST ? process.env.REACT_APP_WEBSOCKET_HOST : window.location.host;
@@ -83,14 +84,14 @@ function ApplicationScope (svgFrame) {
   var last = split[split.length - 1];
   var split2 = last.split(':');
   var last2 = split2[split2.length - 1];
-  this.diagram_id = last2;
+  this.database_id = last2;
 
 
   //Connect websocket
   if (!this.disconnected) {
-    console.log( "ws://" + this.websocket_host + "/ws/prototype?diagram_id=" + this.diagram_id);
+    console.log( "ws://" + this.websocket_host + "/ws/prototype?database_id=" + this.database_id);
     this.control_socket = new ReconnectingWebSocket(
-      "ws://" + this.websocket_host + "/ws/prototype?diagram_id=" + this.diagram_id,
+      "ws://" + this.websocket_host + "/ws/prototype?database_id=" + this.database_id,
       null,
       {debug: false, reconnectInterval: 300});
     this.control_socket.onmessage = function(message) {
@@ -155,16 +156,12 @@ exports.ApplicationScope = ApplicationScope;
 
 ApplicationScope.prototype.uploadButtonHandler = function (message) {
   console.log(message);
-  window.open("/prototype/upload?diagram_id=" + this.diagram_id, "_top");
+  window.open("/prototype/upload?database_id=" + this.database_id, "_top");
 };
 
 ApplicationScope.prototype.downloadButtonHandler = function (message) {
   console.log(message);
-  if (this.selected_groups.length === 1) {
-      window.open("/prototype/download?diagram_id=" + this.diagram_id + "&finite_state_machine_id=" + this.selected_groups[0].id);
-  } else {
-      window.open("/prototype/download?diagram_id=" + this.diagram_id, "_blank");
-  }
+  window.open("/prototype/download?database_id=" + this.database_id, "_blank");
 };
 
 ApplicationScope.prototype.send_trace_message = function (message) {
@@ -394,14 +391,14 @@ ApplicationScope.prototype.onHistory = function (data) {
   }
 };
 
-ApplicationScope.prototype.onDiagram = function(data) {
-  this.diagram_id = data.diagram_id;
-  this.diagram_name = data.name;
-  this.state_id_seq = util.natural_numbers(data.state_id_seq);
-  this.transition_id_seq = util.natural_numbers(data.transition_id_seq);
-  this.group_id_seq = util.natural_numbers(data.fsm_id_seq);
-  this.channel_id_seq = util.natural_numbers(data.channel_id_seq);
-  var path_data = {pathname: '/diagram_id:' + data.diagram_id}
+ApplicationScope.prototype.onDatabase = function(data) {
+  this.database_id = data.database_id;
+  this.panX = data.panX;
+  this.panY = data.panX;
+  this.current_scale = data.scale;
+  this.table_id_seq = util.natural_numbers(data.table_id_seq);
+  this.relation_id_seq = util.natural_numbers(data.relation_id_seq);
+  var path_data = {pathname: '/database_id:' + data.database_id}
   if (this.browser_history.location.pathname !== path_data.pathname) {
     this.browser_history.push(path_data);
   }
@@ -414,4 +411,114 @@ ApplicationScope.prototype.onClientId = function(data) {
 
 ApplicationScope.prototype.onSnapshot = function (data) {
 
+  //Erase the existing state
+  this.tables = [];
+  this.relations = [];
+
+  var table_map = {};
+  var i = 0;
+  var table = null;
+  var new_table = null;
+  var max_table_id = null;
+  var max_relation_id = null;
+  var min_x = null;
+  var min_y = null;
+  var max_x = null;
+  var max_y = null;
+
+  //Build the tables
+  for (i = 0; i < data.tables.length; i++) {
+      table = data.tables[i];
+      if (max_table_id === null || table.id > max_table_id) {
+          max_table_id = table.id;
+      }
+      if (min_x === null || table.x < min_x) {
+          min_x = table.x;
+      }
+      if (min_y === null || table.y < min_y) {
+          min_y = table.y;
+      }
+      if (max_x === null || table.x > max_x) {
+          max_x = table.x;
+      }
+      if (max_y === null || table.y > max_y) {
+          max_y = table.y;
+      }
+      new_table = new database_models.Table(table.id,
+                                     table.name,
+                                     table.x,
+                                     table.y,
+                                     table.type);
+      new_table.column_id_seq = util.natural_numbers(data.tables[i].column_id_seq);
+      this.tables.push(new_table);
+      table_map[table.id] = new_table;
+  }
+
+  //Build the columns
+  var column = null;
+
+  for (i = 0; i < data.columns.length; i++) {
+      column = data.columns[i];
+      table_map[column.table__id].columns.push(new database_models.Column(table_map[column.table__id],
+                                                                column.id,
+                                                                column.name,
+                                                                column.type));
+
+  }
+
+
+  //Build the relations
+  var relation = null;
+  for (i = 0; i < data.relations.length; i++) {
+      relation = data.relations[i];
+      if (max_relation_id === null || relation.id > max_relation_id) {
+          max_relation_id = relation.id;
+      }
+      this.relations.push(new database_models.Relation(relation.id, table_map[relation.from_table].get_column(relation.from_column),
+                                        table_map[relation.to_table].get_column(relation.to_column)));
+  }
+
+  for (i = 0; i < data.tables.length; i++) {
+      this.tables[i].update_positions();
+  }
+
+  // Calculate the new scale to show the entire diagram
+
+  var diff_x;
+  var diff_y;
+  if (min_x !== null && min_y !== null && max_x !== null && max_y !== null) {
+      console.log(['min_x', min_x]);
+      console.log(['min_y', min_y]);
+      console.log(['max_x', max_x]);
+      console.log(['max_y', max_y]);
+
+      diff_x = max_x - min_x;
+      diff_y = max_y - min_y;
+      console.log(['diff_x', diff_x]);
+      console.log(['diff_y', diff_y]);
+
+      console.log(['ratio_x', window.innerWidth/diff_x]);
+      console.log(['ratio_y', window.innerHeight/diff_y]);
+
+      this.current_scale = Math.min(2, Math.max(0.10, Math.min((window.innerWidth-200)/diff_x, (window.innerHeight-300)/diff_y)));
+      this.updateScaledXY();
+      this.updatePanAndScale();
+  }
+  // Calculate the new panX and panY to show the entire diagram
+  if (min_x !== null && min_y !== null) {
+      console.log(['min_x', min_x]);
+      console.log(['min_y', min_y]);
+      diff_x = max_x - min_x;
+      diff_y = max_y - min_y;
+      this.panX = this.current_scale * (-min_x - diff_x/2) + window.innerWidth/2;
+      this.panY = this.current_scale * (-min_y - diff_y/2) + window.innerHeight/2;
+      this.updateScaledXY();
+      this.updatePanAndScale();
+  }
+
+  //Update the table_id_seq to be greater than all table ids to prevent duplicate ids.
+  if (max_table_id !== null) {
+      console.log(['max_table_id', max_table_id]);
+      this.table_id_seq = util.natural_numbers(max_table_id);
+  }
 };
