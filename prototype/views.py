@@ -232,7 +232,7 @@ def upload(request):
             data = yaml.load(request.FILES['file'].read())
             db_id = upload_db(data)
             print(db_id)
-            return HttpResponseRedirect('/static/prototype/index.html#!?database_id={0}'.format(db_id))
+            return HttpResponseRedirect('/#!/database_id:{0}'.format(db_id))
     else:
         form = UploadFileForm()
     return render(request, 'prototype/upload.html', {'form': form})
