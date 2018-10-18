@@ -86,12 +86,13 @@ function ApplicationScope (svgFrame) {
   var last2 = split2[split2.length - 1];
   this.database_id = last2;
 
+  var ws_protocol = window.location.protocol === 'https:' ? 'wss://': 'ws://';
 
   //Connect websocket
   if (!this.disconnected) {
-    console.log( "ws://" + this.websocket_host + "/ws/prototype?database_id=" + this.database_id);
+    console.log( ws_protocol + this.websocket_host + "/ws/prototype?database_id=" + this.database_id);
     this.control_socket = new ReconnectingWebSocket(
-      "ws://" + this.websocket_host + "/ws/prototype?database_id=" + this.database_id,
+      ws_protocol + this.websocket_host + "/ws/prototype?database_id=" + this.database_id,
       null,
       {debug: false, reconnectInterval: 300});
     this.control_socket.onmessage = function(message) {
