@@ -24,6 +24,11 @@ RUN sed -i 's/\r//' /entrypoint
 RUN chmod +x /entrypoint
 RUN chown django /entrypoint
 
+COPY ./compose/production/django/daphne.sh /daphne.sh
+RUN sed -i 's/\r//' /daphne.sh
+RUN chmod +x /daphne.sh
+RUN chown django /daphne.sh
+
 COPY ./compose/production/django/start /start
 RUN sed -i 's/\r//' /start
 RUN chmod +x /start
