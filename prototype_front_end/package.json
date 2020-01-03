@@ -33,7 +33,7 @@
     "yamljs": ""
   },
   "devDependencies": {
-    "eslint": "^3.17.1",
+    "eslint": "^4.18.2",
     "eslint-config-google": "^0.7.1"
   }
 }
